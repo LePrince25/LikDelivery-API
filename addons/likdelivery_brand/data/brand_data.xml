@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <!-- APP_NAME may already exist (likos19_branding post_init hook), so update
+         by key instead of inserting a new record. -->
+    <function model="ir.config_parameter" name="set_param">
+        <value eval="'APP_NAME'"/>
+        <value eval="'Livraison Express'"/>
+    </function>
+</odoo>

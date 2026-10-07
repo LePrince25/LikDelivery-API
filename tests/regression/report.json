@@ -1,0 +1,121 @@
+{
+  "generated_at": "2026-10-06T10:31:00",
+  "flask_base": "http://localhost:5001",
+  "odoo_base": "http://localhost:9410",
+  "scenarios": [
+    {
+      "id": "S01",
+      "name": "catalog",
+      "status": "KNOWN",
+      "first_diff": "opening_hours.windows: list len 7 != 8",
+      "diffs": [],
+      "known_diffs": [
+        "opening_hours.windows: list len 7 != 8",
+        "opening_hours.windows[1]: '1:06:00-23:00' != '0:08:00-20:00'",
+        "opening_hours.windows[2]: '2:06:00-23:00' != '1:06:00-23:00'",
+        "opening_hours.windows[3]: '3:06:00-23:00' != '2:06:00-23:00'",
+        "opening_hours.windows[4]: '4:06:00-23:00' != '3:06:00-23:00'",
+        "opening_hours.windows[5]: '5:06:00-23:00' != '4:06:00-23:00'",
+        "opening_hours.windows[6]: '6:06:00-23:00' != '5:06:00-23:00'"
+      ],
+      "errors": {}
+    },
+    {
+      "id": "S02",
+      "name": "estimate-delivery",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    },
+    {
+      "id": "S03",
+      "name": "register+login+me+profile",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    },
+    {
+      "id": "S04",
+      "name": "cart + checkout preview COD",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    },
+    {
+      "id": "S05",
+      "name": "multi checkout COD",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    },
+    {
+      "id": "S06",
+      "name": "full mission flow",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    },
+    {
+      "id": "S07",
+      "name": "cancel paid order",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    },
+    {
+      "id": "S08",
+      "name": "rating",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    },
+    {
+      "id": "S09",
+      "name": "negative cases",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    },
+    {
+      "id": "S10",
+      "name": "courier request",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    },
+    {
+      "id": "S11",
+      "name": "wallet withdraw (livreur)",
+      "status": "PASS",
+      "first_diff": null,
+      "diffs": [],
+      "known_diffs": [],
+      "errors": {}
+    }
+  ],
+  "totals": {
+    "PASS": 10,
+    "FAIL": 0,
+    "KNOWN": 1,
+    "ERROR": 0
+  },
+  "ok": true
+}

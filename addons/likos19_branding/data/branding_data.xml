@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="default_branding" model="likos.branding">
+        <field name="name">LikOS</field>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+</odoo>

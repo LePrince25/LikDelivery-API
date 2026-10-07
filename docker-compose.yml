@@ -1,0 +1,65 @@
+services:
+  web:
+    image: liksoft/likos:v19-0-1
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_started
+      minio:
+        condition: service_started
+    ports:
+      - "9410:8069"
+    volumes:
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+      - likdelivery-odoo-data:/var/lib/odoo
+    environment:
+      - HOST=db
+      - USER=likdelivery
+      - PASSWORD=likdelivery
+      - LIKOS_ADMIN_PASSWD=likdelivery_admin_2026
+    command: >
+      bash -c "pip3 install -q 'minio>=7.2.0' 'Jinja2>=3.1.0' 'weasyprint>=62.0' 2>/dev/null || true; exec odoo -d db-likdelivery"
+
+  minio:
+    image: minio/minio:RELEASE.2024-06-13T22-53-53Z
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    ports:
+      - "9413:9000"
+      - "9414:9001"
+    environment:
+      MINIO_ROOT_USER: likdelivery
+      MINIO_ROOT_PASSWORD: likdelivery_minio_secret
+    volumes:
+      - likdelivery-minio-data:/data
+
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=likdelivery
+      - POSTGRES_USER=likdelivery
+      - POSTGRES_DB=postgres
+    volumes:
+      - likdelivery-db:/var/lib/postgresql/data
+    ports:
+      - "9411:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U likdelivery -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "9412:8080"
+
+volumes:
+  likdelivery-db:
+  likdelivery-odoo-data:
+  likdelivery-minio-data:

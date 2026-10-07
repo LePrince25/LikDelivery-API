@@ -1,0 +1,318 @@
+:root {
+    --likos-navy: #13233d;
+    --likos-navy-soft: #203653;
+    --likos-blue: #2f6eac;
+    --likos-blue-dark: #285d91;
+    --likos-green: #5bb689;
+    --likos-green-dark: #438d6a;
+    --likos-mint: #e5f5ec;
+    --likos-canvas: #edf2f8;
+    --likos-surface: #ffffff;
+    --likos-border: #d8e0e9;
+    --likos-text: #172942;
+    --likos-muted: #66768d;
+    --likos-focus: rgba(47, 110, 172, 0.28);
+}
+
+.o_web_client {
+    background: var(--likos-canvas);
+    color: var(--likos-text);
+}
+
+// Navigation and LikOS brand mark
+.o_main_navbar {
+    --o-navbar-height: 54px;
+    --NavBar-brand-color: #ffffff;
+    --NavBar-entry-color: rgba(255, 255, 255, 0.9);
+    --NavBar-entry-color--hover: #ffffff;
+    --NavBar-entry-color--active: #ffffff;
+    --NavBar-entry-backgroundColor: transparent;
+    --NavBar-entry-backgroundColor--hover: rgba(255, 255, 255, 0.1);
+    --NavBar-entry-backgroundColor--active: rgba(255, 255, 255, 0.16);
+
+    border: 0;
+    background: linear-gradient(105deg, var(--likos-navy) 0%, var(--likos-navy-soft) 72%, #285d63 100%);
+    box-shadow: 0 5px 18px rgba(19, 35, 61, 0.2);
+
+    .o_navbar_apps_menu .dropdown-toggle {
+        min-width: 54px;
+        justify-content: center;
+        border-right: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .o_menu_brand {
+        gap: 0.6rem;
+        padding-right: 1rem;
+        color: #ffffff;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+
+        &::before {
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            border-radius: 11px;
+            background: var(--likos-app-logo, url("/likos/branding/app-logo")) center / contain no-repeat;
+            content: "";
+        }
+    }
+
+    &:has(.likos-app-logo) .o_menu_brand::before {
+        display: none;
+    }
+
+    .o_menu_brand_logo {
+        margin-left: 0.35rem;
+        margin-right: 0.15rem;
+
+        .likos-app-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 11px;
+            object-fit: contain;
+            background: transparent;
+        }
+
+        .likos-app-logo.is-svg {
+            border-radius: 0;
+        }
+    }
+
+    .o_menu_sections .o_nav_entry,
+    .o_menu_sections .dropdown-toggle {
+        margin: 6px 2px;
+        height: 42px;
+        border-radius: 9px;
+        font-weight: 600;
+    }
+
+    .o_menu_systray > * {
+        color: rgba(255, 255, 255, 0.9);
+    }
+}
+
+.o_app_menu_sidebar {
+    background: var(--likos-surface);
+
+    .o_sidebar_topbar {
+        color: #ffffff;
+        background: linear-gradient(105deg, var(--likos-navy), var(--likos-navy-soft));
+    }
+
+    .o_burger_menu_content .o_app.bg-primary-subtle {
+        color: var(--likos-navy);
+        background: var(--likos-mint) !important;
+    }
+}
+
+// Global controls
+.btn-primary {
+    border-color: transparent !important;
+    background: linear-gradient(105deg, var(--likos-blue), var(--likos-green)) !important;
+    box-shadow: 0 7px 18px rgba(47, 110, 172, 0.2);
+    color: #ffffff !important;
+    font-weight: 650;
+
+    &:hover,
+    &:focus {
+        border-color: transparent !important;
+        background: linear-gradient(105deg, var(--likos-blue-dark), var(--likos-green-dark)) !important;
+        box-shadow: 0 8px 20px rgba(47, 110, 172, 0.28);
+    }
+}
+
+.btn-secondary,
+.btn-light {
+    border-color: var(--likos-border);
+    background: var(--likos-surface);
+    color: var(--likos-text);
+
+    &:hover,
+    &:focus {
+        border-color: #b8c8d9;
+        background: #f7fafc;
+        color: var(--likos-navy);
+    }
+}
+
+.btn:focus-visible,
+.o_input:focus,
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--likos-blue) !important;
+    box-shadow: 0 0 0 0.2rem var(--likos-focus) !important;
+}
+
+a,
+.btn-link,
+.o_field_widget.o_field_many2one .o_external_button {
+    color: var(--likos-blue);
+}
+
+// Page header, search, and view controls
+.o_control_panel {
+    border-bottom: 1px solid var(--likos-border);
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 5px 16px rgba(19, 35, 61, 0.06);
+
+    .o_last_breadcrumb_item,
+    .breadcrumb-item,
+    .o_breadcrumb .active {
+        color: var(--likos-navy);
+        font-weight: 700;
+    }
+
+    .o_searchview {
+        border-color: var(--likos-border);
+        border-radius: 11px;
+        background: #f8fafc;
+    }
+
+    .o_searchview_facet .o_searchview_facet_label {
+        background: var(--likos-blue);
+    }
+
+    .o_cp_switch_buttons .btn.active {
+        color: var(--likos-blue);
+        background: var(--likos-mint);
+    }
+}
+
+.o_action_manager,
+.o_view_controller,
+.o_content {
+    background-color: var(--likos-canvas);
+}
+
+// Forms and settings
+.o_form_view {
+    .o_form_sheet_bg {
+        background: var(--likos-canvas);
+    }
+
+    .o_form_sheet {
+        border: 1px solid var(--likos-border);
+        border-radius: 16px;
+        background: var(--likos-surface);
+        box-shadow: 0 12px 34px rgba(19, 35, 61, 0.08);
+    }
+
+    .oe_title h1,
+    .oe_title h2,
+    .oe_title h3,
+    .o_group .o_group_name {
+        color: var(--likos-navy);
+    }
+
+    .o_horizontal_separator {
+        color: var(--likos-blue);
+        font-weight: 700;
+    }
+
+    .o_form_statusbar {
+        border-bottom: 1px solid var(--likos-border);
+        background: #f8fafc;
+    }
+
+    .o_statusbar_status .btn.btn-primary,
+    .o_statusbar_status .btn-primary.disabled {
+        background: var(--likos-mint) !important;
+        box-shadow: none;
+        color: var(--likos-green-dark) !important;
+    }
+
+    .nav-tabs .nav-link.active {
+        border-bottom-color: var(--likos-green);
+        color: var(--likos-navy);
+        font-weight: 700;
+    }
+}
+
+.o_base_settings .o_setting_container .settings_tab {
+    background: linear-gradient(180deg, var(--likos-navy), var(--likos-navy-soft));
+}
+
+// Lists and kanban
+.o_list_renderer {
+    --ListRenderer-thead-bg-color: #e8eef5;
+
+    background: var(--likos-surface);
+
+    .o_list_table {
+        thead th {
+            border-bottom: 1px solid #cbd6e2;
+            color: var(--likos-navy);
+            font-weight: 700;
+        }
+
+        tbody tr {
+            border-color: #e6ebf1;
+
+            &:hover > td {
+                background: #eef8f3;
+            }
+        }
+
+        .table-active,
+        .o_data_row.table-info > td {
+            background: #e3f0f8 !important;
+        }
+    }
+}
+
+.o_kanban_renderer {
+    background: var(--likos-canvas);
+
+    .o_kanban_record,
+    .o_kanban_quick_create {
+        border: 1px solid var(--likos-border);
+        border-radius: 14px;
+        background: var(--likos-surface);
+        box-shadow: 0 8px 24px rgba(19, 35, 61, 0.07);
+
+        &:hover {
+            border-color: #b9cddd;
+            box-shadow: 0 12px 28px rgba(19, 35, 61, 0.11);
+        }
+    }
+}
+
+.badge.text-bg-primary,
+.badge.bg-primary,
+.o_tag_color_0 {
+    background-color: var(--likos-mint) !important;
+    color: var(--likos-green-dark) !important;
+}
+
+.dropdown-menu {
+    border-color: var(--likos-border);
+    border-radius: 12px;
+    box-shadow: 0 14px 34px rgba(19, 35, 61, 0.16);
+
+    .dropdown-item:hover,
+    .dropdown-item:focus,
+    .dropdown-item.focus {
+        background: var(--likos-mint);
+        color: var(--likos-navy);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_main_navbar {
+        --o-navbar-height: 50px;
+    }
+
+    .o_form_view .o_form_sheet {
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn,
+    .o_kanban_record {
+        transition: none !important;
+    }
+}

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_notification_test_form" model="ir.ui.view">
+        <field name="name">likdelivery.notification.test.form</field>
+        <field name="model">likdelivery.notification.test</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="lik_user_id"/>
+                    <field name="guest_phone"/>
+                    <field name="channel"/>
+                    <field name="title"/>
+                    <field name="body"/>
+                </group>
+                <footer>
+                    <button name="action_send" type="object" string="Envoyer"
+                            class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_notification_test" model="ir.actions.act_window">
+        <field name="name">Notification test</field>
+        <field name="res_model">likdelivery.notification.test</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_assign_driver_form" model="ir.ui.view">
+        <field name="name">likdelivery.assign.driver.form</field>
+        <field name="model">likdelivery.assign.driver</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="order_id"/>
+                    <field name="livreur_id"/>
+                </group>
+                <footer>
+                    <button name="action_assign" type="object" string="Assigner"
+                            class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_assign_driver_wizard" model="ir.actions.act_window">
+        <field name="name">Assigner un livreur</field>
+        <field name="res_model">likdelivery.assign.driver</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_order_id': active_id}</field>
+    </record>
+</odoo>

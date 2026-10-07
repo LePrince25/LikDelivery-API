@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_lik_migration_map_admin,likdelivery.migration.map admin,model_likdelivery_migration_map,likdelivery_core.group_lik_admin,1,1,1,1
+access_lik_migration_map_user,likdelivery.migration.map user,model_likdelivery_migration_map,base.group_user,1,0,0,0
+access_lik_migration_import_admin,likdelivery.migration.import admin,model_likdelivery_migration_import,likdelivery_core.group_lik_admin,1,1,1,1
+access_lik_migration_import_user,likdelivery.migration.import user,model_likdelivery_migration_import,base.group_user,1,0,0,0

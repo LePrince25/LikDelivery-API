@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Dashboard (back-office stats page) -->
+    <record id="action_lik_dashboard" model="ir.actions.act_url">
+        <field name="name">Tableau de bord</field>
+        <field name="url">/likdelivery/admin/stats</field>
+        <field name="target">self</field>
+    </record>
+
+    <menuitem id="menu_likdelivery_root"
+              name="Livraison"
+              sequence="10"
+              groups="likdelivery_core.group_lik_admin"
+              web_icon="likdelivery_core,static/description/icon.png"
+              action="action_lik_dashboard"/>
+
+    <menuitem id="menu_likdelivery_operations"
+              name="Opérations"
+              parent="menu_likdelivery_root"
+              sequence="10"/>
+    <menuitem id="menu_lik_orders"
+              action="action_lik_orders"
+              parent="menu_likdelivery_operations"
+              sequence="10"/>
+    <menuitem id="menu_lik_runs"
+              action="action_lik_runs"
+              parent="menu_likdelivery_operations"
+              sequence="20"/>
+    <menuitem id="menu_lik_courier_requests"
+              action="action_lik_courier_requests"
+              parent="menu_likdelivery_operations"
+              sequence="30"/>
+    <menuitem id="menu_lik_driver_locations"
+              action="action_lik_driver_locations"
+              parent="menu_likdelivery_operations"
+              sequence="40"/>
+
+    <menuitem id="menu_likdelivery_catalog"
+              name="Catalogue"
+              parent="menu_likdelivery_root"
+              sequence="20"/>
+    <menuitem id="menu_lik_products"
+              action="action_lik_products"
+              parent="menu_likdelivery_catalog"
+              sequence="10"/>
+    <menuitem id="menu_lik_product_categories"
+              action="action_lik_product_categories"
+              parent="menu_likdelivery_catalog"
+              sequence="20"/>
+
+    <menuitem id="menu_likdelivery_network"
+              name="Réseau"
+              parent="menu_likdelivery_root"
+              sequence="30"/>
+    <menuitem id="menu_lik_users"
+              action="action_lik_users"
+              parent="menu_likdelivery_network"
+              sequence="10"/>
+    <menuitem id="menu_lik_shop_drivers"
+              action="action_lik_shop_drivers"
+              parent="menu_likdelivery_network"
+              sequence="20"/>
+    <menuitem id="menu_lik_fleet_drivers"
+              action="action_lik_fleet_drivers"
+              parent="menu_likdelivery_network"
+              sequence="30"/>
+    <menuitem id="menu_lik_opening_hours"
+              action="action_lik_opening_hours"
+              parent="menu_likdelivery_network"
+              sequence="40"/>
+
+    <menuitem id="menu_likdelivery_finance"
+              name="Finance"
+              parent="menu_likdelivery_root"
+              sequence="40"/>
+    <menuitem id="menu_lik_payment_transactions"
+              action="action_lik_payment_transactions"
+              parent="menu_likdelivery_finance"
+              sequence="10"/>
+    <menuitem id="menu_lik_wallet_withdrawals"
+              action="action_lik_wallet_withdrawals"
+              parent="menu_likdelivery_finance"
+              sequence="20"/>
+
+    <menuitem id="menu_likdelivery_supervision"
+              name="Supervision"
+              parent="menu_likdelivery_root"
+              sequence="50"/>
+    <menuitem id="menu_lik_notifications"
+              action="action_lik_notifications"
+              parent="menu_likdelivery_supervision"
+              sequence="10"/>
+    <menuitem id="menu_lik_audit_logs"
+              action="action_lik_audit_logs"
+              parent="menu_likdelivery_supervision"
+              sequence="20"/>
+    <menuitem id="menu_lik_pending_kyc"
+              action="action_lik_pending_kyc"
+              parent="menu_likdelivery_supervision"
+              sequence="15"/>
+    <menuitem id="menu_lik_notification_test"
+              action="action_notification_test"
+              parent="menu_likdelivery_supervision"
+              sequence="25"/>
+    <menuitem id="menu_lik_cancellation_rules"
+              action="action_lik_cancellation_rules"
+              parent="menu_likdelivery_supervision"
+              sequence="30"/>
+
+</odoo>

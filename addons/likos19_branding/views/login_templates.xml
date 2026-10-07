@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="likos_web_favicon" inherit_id="web.layout" priority="90">
+        <xpath expr="//link[@rel='shortcut icon']" position="replace">
+            <t t-set="branding" t-value="request.env['likos.branding'].sudo().get_for_request()"/>
+            <link rel="shortcut icon" sizes="any" t-att-type="branding.public_image_mimetype('favicon')" t-att-href="'/likos/branding/favicon?v=%s' % branding.asset_version()"/>
+            <link rel="icon" sizes="any" t-att-type="branding.public_image_mimetype('favicon')" t-att-href="'/likos/branding/favicon?v=%s' % branding.asset_version()"/>
+        </xpath>
+    </template>
+
+    <template id="likos_login_layout" inherit_id="web.login_layout" priority="90">
+        <xpath expr="//t[@t-set='body_classname']" position="replace">
+            <t t-set="body_classname" t-value="'likos-login-body'"/>
+        </xpath>
+
+        <xpath expr="//div[hasclass('container')]" position="attributes">
+            <attribute name="class">likos-login-shell</attribute>
+        </xpath>
+
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]" position="attributes">
+            <attribute name="t-attf-class">card border-0 likos-login-card {{login_card_classes}} o_database_list</attribute>
+            <attribute name="style">max-width: 560px;</attribute>
+        </xpath>
+
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]/div[hasclass('card-body')]/div[1]" position="replace">
+            <div class="likos-login-brand">
+                <img class="likos-login-logo" data-likos-login-logo="1" t-att-src="'/likos/branding/login-logo?v=%s' % request.env['likos.branding'].sudo().get_for_request().asset_version()" alt="LikOS"/>
+                <div>
+                    <strong data-likos-app-name="">LikOS</strong>
+                </div>
+            </div>
+            <div class="likos-login-heading">
+                <h2>Bienvenue</h2>
+                <p>Connectez-vous à votre espace de pilotage.</p>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]/div[hasclass('card-body')]/div[@t-if='not disable_footer']" position="replace">
+            <div class="likos-login-footer" t-if="not disable_footer">
+                <span class="likos-login-footer-name" data-likos-app-name="">LikOS</span>
+                <span>Accès sécurisé</span>
+            </div>
+        </xpath>
+    </template>
+</odoo>

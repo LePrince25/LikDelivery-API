@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="likos19_branding.NavBar" t-inherit="web.NavBar" t-inherit-mode="extension">
+        <xpath expr="//DropdownItem[@t-esc='currentApp.name']" position="before">
+            <a t-if="!this.ui.isSmall and currentApp" class="o_menu_brand_logo d-flex align-items-center" t-att-href="getMenuItemHref(currentApp)">
+                <img class="likos-app-logo" data-likos-app-logo="1" t-att-src="brandingAppLogo" alt=""/>
+            </a>
+        </xpath>
+    </t>
+
+    <t t-name="likos19_branding.NavBarAppsMenu" t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
+        <xpath expr="//a[@href='/odoo']" position="attributes">
+            <attribute name="href">/likos</attribute>
+        </xpath>
+    </t>
+
+    <t t-name="likos19_branding.NavBarAppsMenuSidebar" t-inherit="web.NavBar.AppsMenu.Sidebar" t-inherit-mode="extension">
+        <xpath expr="//a[@href='/odoo']" position="attributes">
+            <attribute name="href">/likos</attribute>
+        </xpath>
+    </t>
+</templates>

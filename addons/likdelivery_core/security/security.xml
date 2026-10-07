@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Lik Delivery security groups (§S of the traceability matrix).
+         All imply base.group_user: API users are internal users technically,
+         record rules (later sprints) restrict what each role can touch. -->
+    <record id="group_lik_client" model="res.groups">
+        <field name="name">Lik / Client</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_lik_fournisseur" model="res.groups">
+        <field name="name">Lik / Fournisseur</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_lik_livreur" model="res.groups">
+        <field name="name">Lik / Livreur</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_lik_societe" model="res.groups">
+        <field name="name">Lik / Société de livraison</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_lik_admin" model="res.groups">
+        <field name="name">Lik / Administrateur plateforme</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+</odoo>

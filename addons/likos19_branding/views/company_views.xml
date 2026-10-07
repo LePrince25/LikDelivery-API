@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form_likos_branding" model="ir.ui.view">
+        <field name="name">res.company.form.likos.branding</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Logos LikOS" name="likos_branding" groups="base.group_system">
+                    <p>
+                        Logos utilisés par le backend LikOS pour cette société.
+                        PNG, JPEG, WebP, ICO et SVG sont acceptés.
+                        Laissez un champ vide pour conserver le logo LikOS par défaut.
+                    </p>
+                    <group>
+                        <group string="Favicon">
+                            <field name="likos_favicon" widget="image" filename="likos_favicon_filename" options="{'accepted_file_extensions': 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg,.ico'}"/>
+                            <field name="likos_favicon_filename" invisible="1"/>
+                        </group>
+                        <group string="Logo de connexion">
+                            <field name="likos_login_logo" widget="image" filename="likos_login_logo_filename" options="{'accepted_file_extensions': 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg'}"/>
+                            <field name="likos_login_logo_filename" invisible="1"/>
+                        </group>
+                        <group string="Logo de l'application">
+                            <field name="likos_app_logo" widget="image" filename="likos_app_logo_filename" options="{'accepted_file_extensions': 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg'}"/>
+                            <field name="likos_app_logo_filename" invisible="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

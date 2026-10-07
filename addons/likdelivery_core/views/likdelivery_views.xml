@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===== res.partner: Livraison tab ===== -->
+    <record id="view_partner_form_likdelivery" model="ir.ui.view">
+        <field name="name">res.partner.form.likdelivery</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Livraison" name="likdelivery">
+                    <group>
+                        <group string="Compte">
+                            <field name="lik_role"/>
+                            <field name="lik_first_name"/>
+                            <field name="lik_last_name"/>
+                            <field name="lik_company_name"/>
+                            <field name="lik_validated_by_admin"/>
+                            <field name="lik_preferred_societe_id"/>
+                            <field name="lik_employer_societe_id"/>
+                        </group>
+                        <group string="Livreur">
+                            <field name="lik_vehicle_type"/>
+                            <field name="lik_license_plate"/>
+                            <field name="lik_average_rating"/>
+                            <field name="lik_total_deliveries"/>
+                        </group>
+                        <group string="KYC" groups="likdelivery_core.group_lik_admin">
+                            <field name="lik_id_document" filename="lik_id_document_filename"/>
+                            <field name="lik_id_document_filename" invisible="1"/>
+                            <field name="lik_cfe_document" filename="lik_cfe_document_filename"/>
+                            <field name="lik_cfe_document_filename" invisible="1"/>
+                        </group>
+                        <group string="Portefeuille">
+                            <field name="lik_wallet_earned"/>
+                            <field name="lik_wallet_withdrawn"/>
+                            <field name="lik_wallet_available"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- ===== likdelivery.order ===== -->
+    <record id="view_lik_order_list" model="ir.ui.view">
+        <field name="name">likdelivery.order.list</field>
+        <field name="model">likdelivery.order</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state == 'FAILED'"
+                  decoration-muted="state == 'CANCELLED'"
+                  decoration-success="state == 'DELIVERED'">
+                <field name="code"/>
+                <field name="client_id"/>
+                <field name="supplier_id"/>
+                <field name="mode"/>
+                <field name="state" widget="badge"/>
+                <field name="payment_method"/>
+                <field name="payment_status" widget="badge"/>
+                <field name="total"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_lik_order_form" model="ir.ui.view">
+        <field name="name">likdelivery.order.form</field>
+        <field name="model">likdelivery.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="%(likdelivery_core.action_assign_driver_wizard)d"
+                            type="action"
+                            string="Assigner un livreur"
+                            class="btn-primary"
+                            invisible="state in ('DELIVERED', 'CANCELLED', 'FAILED') or mode == 'pickup'"
+                            groups="likdelivery_core.group_lik_admin"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="code" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Acteurs">
+                            <field name="client_id"/>
+                            <field name="guest_phone"/>
+                            <field name="supplier_id"/>
+                            <field name="preferred_societe_id"/>
+                        </group>
+                        <group string="Suivi">
+                            <field name="mode"/>
+                            <field name="state"/>
+                            <field name="otp_code" groups="likdelivery_core.group_lik_admin"/>
+                            <field name="open_for_platform_claim"/>
+                            <field name="supplier_wallet_credited"/>
+                        </group>
+                        <group string="Livraison">
+                            <field name="delivery_address"/>
+                            <field name="delivery_lat"/>
+                            <field name="delivery_lon"/>
+                            <field name="is_fragile"/>
+                        </group>
+                        <group string="Montants &amp; paiement">
+                            <field name="product_total"/>
+                            <field name="delivery_fee"/>
+                            <field name="total"/>
+                            <field name="payment_method"/>
+                            <field name="payment_status"/>
+                        </group>
+                        <group string="Notation">
+                            <field name="rating"/>
+                            <field name="rating_comment"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lignes">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Courses">
+                            <field name="run_ids">
+                                <list>
+                                    <field name="livreur_id"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="price"/>
+                                    <field name="source"/>
+                                    <field name="create_date"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_lik_orders" model="ir.actions.act_window">
+        <field name="name">Commandes</field>
+        <field name="res_model">likdelivery.order</field>
+        <field name="view_mode">list,form,graph,pivot</field>
+    </record>
+
+    <!-- ===== likdelivery.delivery.run ===== -->
+    <record id="view_lik_run_list" model="ir.ui.view">
+        <field name="name">likdelivery.delivery.run.list</field>
+        <field name="model">likdelivery.delivery.run</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'CANCELLED'"
+                  decoration-success="state == 'DELIVERED'">
+                <field name="order_id"/>
+                <field name="livreur_id"/>
+                <field name="state" widget="badge"/>
+                <field name="source"/>
+                <field name="distance_km"/>
+                <field name="price"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_lik_run_form" model="ir.ui.view">
+        <field name="name">likdelivery.delivery.run.form</field>
+        <field name="model">likdelivery.delivery.run</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group string="Mission">
+                            <field name="order_id"/>
+                            <field name="livreur_id"/>
+                            <field name="state"/>
+                            <field name="source"/>
+                            <field name="standalone"/>
+                            <field name="is_fragile"/>
+                        </group>
+                        <group string="Validation">
+                            <field name="otp_code" groups="likdelivery_core.group_lik_admin"/>
+                            <field name="qr_token" groups="likdelivery_core.group_lik_admin"/>
+                            <field name="pickup_time"/>
+                            <field name="delivery_time"/>
+                        </group>
+                        <group string="Enlèvement">
+                            <field name="pickup_address"/>
+                            <field name="pickup_lat"/>
+                            <field name="pickup_lon"/>
+                        </group>
+                        <group string="Dépôt">
+                            <field name="dropoff_address"/>
+                            <field name="dropoff_lat"/>
+                            <field name="dropoff_lon"/>
+                        </group>
+                        <group string="Tarification">
+                            <field name="distance_km"/>
+                            <field name="price"/>
+                        </group>
+                        <group string="Notation">
+                            <field name="rating"/>
+                            <field name="rating_comment"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_lik_runs" model="ir.actions.act_window">
+        <field name="name">Courses</field>
+        <field name="res_model">likdelivery.delivery.run</field>
+        <field name="view_mode">list,form,pivot</field>
+    </record>
+
+    <!-- ===== likdelivery.product ===== -->
+    <record id="view_lik_product_list" model="ir.ui.view">
+        <field name="name">likdelivery.product.list</field>
+        <field name="model">likdelivery.product</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="name"/>
+                <field name="supplier_id"/>
+                <field name="category_id"/>
+                <field name="price"/>
+                <field name="stock"/>
+                <field name="fragile"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_lik_product_form" model="ir.ui.view">
+        <field name="name">likdelivery.product.form</field>
+        <field name="model">likdelivery.product</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="image_1920" class="oe_avatar" widget="image"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="supplier_id"/>
+                            <field name="category_id"/>
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="fragile"/>
+                        </group>
+                        <group>
+                            <field name="price"/>
+                            <field name="stock"/>
+                            <field name="lik_image_url"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_lik_products" model="ir.actions.act_window">
+        <field name="name">Produits</field>
+        <field name="res_model">likdelivery.product</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_lik_product_categories" model="ir.actions.act_window">
+        <field name="name">Catégories</field>
+        <field name="res_model">likdelivery.product.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ===== Comptes plateforme ===== -->
+    <record id="view_lik_user_list" model="ir.ui.view">
+        <field name="name">likdelivery.user.list</field>
+        <field name="model">likdelivery.user</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="phone"/>
+                <field name="name"/>
+                <field name="lik_role" widget="badge"/>
+                <field name="lik_company_name"/>
+                <field name="lik_validated_by_admin"/>
+                <field name="lik_average_rating"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_lik_user_form" model="ir.ui.view">
+        <field name="name">likdelivery.user.form</field>
+        <field name="model">likdelivery.user</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_validate_account"
+                            type="object"
+                            string="Valider le compte"
+                            class="btn-primary"
+                            invisible="lik_validated_by_admin"
+                            groups="likdelivery_core.group_lik_admin"/>
+                    <button name="action_view_kyc"
+                            type="object"
+                            string="Consulter KYC (audit)"
+                            invisible="not lik_id_document and not lik_cfe_document"
+                            groups="likdelivery_core.group_lik_admin"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Compte">
+                            <field name="phone"/>
+                            <field name="lik_role"/>
+                            <field name="lik_first_name"/>
+                            <field name="lik_last_name"/>
+                            <field name="lik_company_name"/>
+                            <field name="lik_validated_by_admin"/>
+                        </group>
+                        <group string="Livreur / liens">
+                            <field name="lik_vehicle_type"/>
+                            <field name="lik_license_plate"/>
+                            <field name="lik_average_rating"/>
+                            <field name="lik_total_deliveries"/>
+                            <field name="lik_preferred_societe_id"/>
+                            <field name="lik_employer_societe_id"/>
+                        </group>
+                        <group string="Portefeuille">
+                            <field name="lik_wallet_earned"/>
+                            <field name="lik_wallet_withdrawn"/>
+                            <field name="lik_wallet_available"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_lik_users" model="ir.actions.act_window">
+        <field name="name">Comptes plateforme</field>
+        <field name="res_model">likdelivery.user</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- KYC validation queue: fournisseurs/sociétés non validés -->
+    <record id="view_lik_user_search" model="ir.ui.view">
+        <field name="name">likdelivery.user.search</field>
+        <field name="model">likdelivery.user</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="phone"/>
+                <filter name="pending_kyc" string="En attente de validation"
+                        domain="[('lik_role', 'in', ('fournisseur', 'societe')), ('lik_validated_by_admin', '=', False)]"/>
+                <filter name="fournisseurs" string="Fournisseurs"
+                        domain="[('lik_role', '=', 'fournisseur')]"/>
+                <filter name="livreurs" string="Livreurs"
+                        domain="[('lik_role', '=', 'livreur')]"/>
+                <filter name="societes" string="Sociétés"
+                        domain="[('lik_role', '=', 'societe')]"/>
+                <filter name="group_role" string="Rôle" context="{'group_by': 'lik_role'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_lik_pending_kyc" model="ir.actions.act_window">
+        <field name="name">Validations KYC</field>
+        <field name="res_model">likdelivery.user</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_lik_user_search"/>
+        <field name="domain">[('lik_role', 'in', ('fournisseur', 'societe')), ('lik_validated_by_admin', '=', False)]</field>
+        <field name="context">{'search_default_pending_kyc': 1}</field>
+    </record>
+
+    <!-- ===== Graph/pivot views for the admin dashboard ===== -->
+    <record id="view_lik_order_graph" model="ir.ui.view">
+        <field name="name">likdelivery.order.graph</field>
+        <field name="model">likdelivery.order</field>
+        <field name="arch" type="xml">
+            <graph type="line">
+                <field name="create_date" interval="day"/>
+                <field name="total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_lik_order_pivot" model="ir.ui.view">
+        <field name="name">likdelivery.order.pivot</field>
+        <field name="model">likdelivery.order</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="supplier_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_lik_run_pivot" model="ir.ui.view">
+        <field name="name">likdelivery.delivery.run.pivot</field>
+        <field name="model">likdelivery.delivery.run</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="livreur_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="price" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ===== Configuration & supervision (list-only actions) ===== -->
+    <record id="action_lik_opening_hours" model="ir.actions.act_window">
+        <field name="name">Plages horaires</field>
+        <field name="res_model">likdelivery.opening.hour</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_lik_shop_drivers" model="ir.actions.act_window">
+        <field name="name">Livreurs de boutique</field>
+        <field name="res_model">likdelivery.shop.driver</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_lik_fleet_drivers" model="ir.actions.act_window">
+        <field name="name">Flottes sociétés</field>
+        <field name="res_model">likdelivery.fleet.driver</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_lik_courier_requests" model="ir.actions.act_window">
+        <field name="name">Courses colis</field>
+        <field name="res_model">likdelivery.courier.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_lik_payment_transactions" model="ir.actions.act_window">
+        <field name="name">Transactions de paiement</field>
+        <field name="res_model">likdelivery.payment.transaction</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_lik_notifications" model="ir.actions.act_window">
+        <field name="name">Notifications</field>
+        <field name="res_model">likdelivery.notification</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_lik_wallet_withdrawals" model="ir.actions.act_window">
+        <field name="name">Retraits portefeuille</field>
+        <field name="res_model">likdelivery.wallet.withdrawal</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_lik_driver_locations" model="ir.actions.act_window">
+        <field name="name">Positions GPS livreurs</field>
+        <field name="res_model">likdelivery.driver.location</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_lik_audit_logs" model="ir.actions.act_window">
+        <field name="name">Journal d'audit</field>
+        <field name="res_model">likdelivery.audit.log</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="action_lik_cancellation_rules" model="ir.actions.act_window">
+        <field name="name">Règles d'annulation</field>
+        <field name="res_model">likdelivery.cancellation.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,168 @@
+.likos-login-body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background:
+        radial-gradient(circle at 92% 12%, rgba(91, 182, 137, 0.24), transparent 30rem),
+        radial-gradient(circle at 8% 88%, rgba(47, 110, 172, 0.18), transparent 34rem),
+        #f4f7fb;
+    color: #172942;
+
+    #wrapwrap,
+    main {
+        min-height: 100vh;
+    }
+
+    .likos-login-shell {
+        position: relative;
+        display: flex;
+        min-height: 100vh;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: clamp(2rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .likos-login-card {
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid rgba(216, 224, 233, 0.85) !important;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 26px 70px rgba(19, 35, 61, 0.16);
+        backdrop-filter: blur(18px);
+
+        .card-body {
+            padding: clamp(2.25rem, 5vw, 3.5rem);
+        }
+    }
+
+    .likos-login-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.85rem;
+
+        img,
+        .likos-login-logo {
+            width: 88px;
+            height: 88px;
+            border-radius: 22px;
+            object-fit: contain;
+            background: transparent;
+        }
+
+        .likos-login-logo.is-svg {
+            border-radius: 0;
+        }
+
+        strong {
+            display: block;
+            color: #13233d;
+            font-size: 1.35rem;
+            letter-spacing: 0.02em;
+        }
+    }
+
+    .likos-login-heading {
+        margin: 2.5rem 0 2rem;
+
+        h2 {
+            margin: 0;
+            color: #13233d;
+            font-size: 2.25rem;
+            font-weight: 750;
+        }
+
+        p {
+            margin: 0.45rem 0 0;
+            color: #66768d;
+            font-size: 1rem;
+        }
+    }
+
+    .form-label {
+        color: #32445e;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .form-control,
+    .input-group .btn {
+        min-height: 56px;
+        border-color: #d8e0e9;
+        background-color: #f8fafc;
+    }
+
+    .form-control:focus {
+        border-color: #2f6eac;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 0.22rem rgba(47, 110, 172, 0.16);
+    }
+
+    .oe_login_buttons > .btn-primary {
+        min-height: 56px;
+        border: 0;
+        border-radius: 13px;
+        background: linear-gradient(105deg, #2f6eac, #5bb689);
+        box-shadow: 0 10px 24px rgba(47, 110, 172, 0.24);
+        font-weight: 750;
+    }
+
+    .passkey_login_link {
+        border-color: #d8e0e9;
+        border-radius: 12px;
+        color: #32445e;
+    }
+
+    .likos-login-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.75rem;
+        padding-top: 1.15rem;
+        border-top: 1px solid #e2e8ef;
+        color: #7a8799;
+        font-size: 0.72rem;
+
+        .likos-login-footer-name {
+            color: #2f6eac;
+            font-weight: 700;
+        }
+    }
+
+    .alert-danger {
+        border-color: #f1c6c6;
+        border-radius: 11px;
+        background: #fff3f3;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .likos-login-body {
+        .likos-login-shell {
+            max-width: 680px;
+        }
+    }
+}
+
+@media (max-width: 575.98px) {
+    .likos-login-body {
+        .likos-login-shell {
+            padding: 1rem;
+        }
+
+        .likos-login-card {
+            border-radius: 18px;
+
+            .card-body {
+                padding: 1.5rem;
+            }
+        }
+
+        .likos-login-footer {
+            gap: 0.4rem;
+            flex-direction: column;
+        }
+    }
+}

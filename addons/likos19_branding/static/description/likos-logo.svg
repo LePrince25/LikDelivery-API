@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="LikOS">
+  <rect width="512" height="512" rx="128" fill="#13233d"/>
+  <rect x="72" y="72" width="368" height="368" rx="88" fill="#2f6eac"/>
+  <path fill="#ffffff" d="M176 148h72v216h88v48H176z"/>
+</svg>

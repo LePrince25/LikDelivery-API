@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_likos_branding_list" model="ir.ui.view">
+        <field name="name">likos.branding.list</field>
+        <field name="model">likos.branding</field>
+        <field name="arch" type="xml">
+            <list create="false" delete="false">
+                <field name="company_id"/>
+                <field name="name"/>
+                <field name="login_logo" widget="image" options="{'size': [40, 40]}"/>
+                <field name="app_logo" widget="image" options="{'size': [40, 40]}"/>
+                <field name="favicon" widget="image" options="{'size': [32, 32]}"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_likos_branding_form" model="ir.ui.view">
+        <field name="name">likos.branding.form</field>
+        <field name="model">likos.branding</field>
+        <field name="arch" type="xml">
+            <form string="Logos et icônes" create="false" delete="false">
+                <header>
+                    <button name="action_apply" type="object" string="Enregistrer et appliquer" class="btn-primary" data-hotkey="q"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Logos et icônes</h1>
+                    </div>
+                    <p>
+                        Choisissez les visuels utilisés par le backend LikOS 19 pour cette organisation.
+                        PNG, JPEG, WebP, ICO et SVG sont acceptés.
+                        Laissez un champ vide pour conserver le logo LikOS par défaut.
+                    </p>
+                    <group>
+                        <field name="company_id" readonly="1"/>
+                        <field name="name"/>
+                    </group>
+                    <group>
+                        <group string="Favicon">
+                            <field name="favicon" widget="image" filename="favicon_filename" options="{'accepted_file_extensions': 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg,.ico'}"/>
+                            <field name="favicon_filename" invisible="1"/>
+                        </group>
+                        <group string="Logo de connexion">
+                            <field name="login_logo" widget="image" filename="login_logo_filename" options="{'accepted_file_extensions': 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg'}"/>
+                            <field name="login_logo_filename" invisible="1"/>
+                        </group>
+                        <group string="Logo de l'application">
+                            <field name="app_logo" widget="image" filename="app_logo_filename" options="{'accepted_file_extensions': 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg'}"/>
+                            <field name="app_logo_filename" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_likos_branding_window" model="ir.actions.act_window">
+        <field name="name">Logos et icônes</field>
+        <field name="res_model">likos.branding</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'create': False, 'delete': False}</field>
+    </record>
+
+    <record id="action_likos_branding" model="ir.actions.server">
+        <field name="name">Logos et icônes</field>
+        <field name="model_id" ref="model_likos_branding"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_list()</field>
+    </record>
+
+    <menuitem
+        id="menu_likos_branding"
+        name="Logos LikOS"
+        parent="base.menu_administration"
+        action="action_likos_branding"
+        sequence="4"
+        groups="base.group_system"
+    />
+</odoo>
