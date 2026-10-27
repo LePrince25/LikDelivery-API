@@ -400,7 +400,7 @@
         <field name="context">{'search_default_pending_kyc': 1}</field>
     </record>
 
-    <!-- ===== Graph/pivot views for the admin dashboard ===== -->
+    <!-- ===== Native graph/pivot analysis views ===== -->
     <record id="view_lik_order_graph" model="ir.ui.view">
         <field name="name">likdelivery.order.graph</field>
         <field name="model">likdelivery.order</field>

@@ -21,13 +21,6 @@ All business rules are numbered in delivery/docs/02-traceability-matrix.md.
         "views/likdelivery_menus.xml",
     ],
     "post_init_hook": "_post_init_seed_demo",
-    "assets": {
-        "web.assets_backend": [
-            "likdelivery_core/static/src/views/dashboard/dashboard_view.js",
-            "likdelivery_core/static/src/views/dashboard/dashboard_view.xml",
-            "likdelivery_core/static/src/views/dashboard/dashboard_view.scss",
-        ],
-    },
     "application": True,
     "installable": True,
 }

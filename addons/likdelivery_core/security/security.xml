@@ -38,13 +38,7 @@
     </record>
 
     <!-- ===== Permissions granulaires ===== -->
-    <record id="group_lik_perm_dashboard" model="res.groups">
-        <field name="name">Tableau de bord</field>
-        <field name="privilege_id" ref="privilege_lik_permissions"/>
-        <field name="lik_is_permission_group" eval="True"/>
-        <field name="lik_sequence">10</field>
-        <field name="lik_description">Accès au tableau de bord d'activité de la plateforme.</field>
-    </record>
+    <delete id="group_lik_perm_dashboard" model="res.groups"/>
 
     <record id="group_lik_perm_orders_view" model="res.groups">
         <field name="name">Consulter les commandes</field>
@@ -205,7 +199,7 @@
         <field name="lik_role_code">admin</field>
         <field name="lik_sequence">90</field>
         <field name="lik_description">Administrateur : toutes les permissions et accès aux paramètres Odoo.</field>
-        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('base.group_system')), Command.link(ref('group_lik_perm_dashboard')), Command.link(ref('group_lik_perm_backend_global')), Command.link(ref('group_lik_perm_orders_view')), Command.link(ref('group_lik_perm_orders_manage')), Command.link(ref('group_lik_perm_catalog_view')), Command.link(ref('group_lik_perm_catalog_manage')), Command.link(ref('group_lik_perm_network_view')), Command.link(ref('group_lik_perm_network_manage')), Command.link(ref('group_lik_perm_kyc_manage')), Command.link(ref('group_lik_perm_finance_view')), Command.link(ref('group_lik_perm_finance_manage')), Command.link(ref('group_lik_perm_supervision_view')), Command.link(ref('group_lik_perm_notifications_manage')), Command.link(ref('group_lik_perm_admin_manage'))]"/>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('base.group_system')), Command.link(ref('group_lik_perm_backend_global')), Command.link(ref('group_lik_perm_orders_view')), Command.link(ref('group_lik_perm_orders_manage')), Command.link(ref('group_lik_perm_catalog_view')), Command.link(ref('group_lik_perm_catalog_manage')), Command.link(ref('group_lik_perm_network_view')), Command.link(ref('group_lik_perm_network_manage')), Command.link(ref('group_lik_perm_kyc_manage')), Command.link(ref('group_lik_perm_finance_view')), Command.link(ref('group_lik_perm_finance_manage')), Command.link(ref('group_lik_perm_supervision_view')), Command.link(ref('group_lik_perm_notifications_manage')), Command.link(ref('group_lik_perm_admin_manage'))]"/>
     </record>
 
     <!--
