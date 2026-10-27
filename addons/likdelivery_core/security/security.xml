@@ -1,30 +1,240 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Lik Delivery security groups (§S of the traceability matrix).
-         All imply base.group_user: API users are internal users technically,
-         record rules (later sprints) restrict what each role can touch. -->
+    <!--
+        Lik Delivery RBAC
+
+        Two levels:
+        * role groups (Client, Fournisseur, Livreur, Société, Admin) are the
+          high-level profiles selected on the user form. Each role implies its
+          permission groups.
+        * permission groups are granular capabilities (view/manage orders,
+          catalog, network, finance...). They can also be granted individually
+          from the "Rôle & Permissions" tab of the user form.
+
+        Menus, buttons and ACLs are all bound to the permission groups, so a
+        role change automatically re-scopes the whole back-office UI.
+    -->
+
+    <record id="module_category_likdelivery" model="ir.module.category">
+        <field name="name">Livraison</field>
+        <field name="sequence">30</field>
+        <field name="description">Rôles et permissions de la plateforme Livraison.</field>
+    </record>
+
+    <record id="privilege_lik_roles" model="res.groups.privilege">
+        <field name="name">Rôles Livraison</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="module_category_likdelivery"/>
+        <field name="placeholder">Aucun rôle</field>
+        <field name="description">Profil métier de l'utilisateur. Un rôle accorde automatiquement toutes ses permissions.</field>
+    </record>
+
+    <record id="privilege_lik_permissions" model="res.groups.privilege">
+        <field name="name">Permissions Livraison</field>
+        <field name="sequence">20</field>
+        <field name="category_id" ref="module_category_likdelivery"/>
+        <field name="placeholder">Aucune permission</field>
+        <field name="description">Permissions granulaires accordées en plus du rôle.</field>
+    </record>
+
+    <!-- ===== Permissions granulaires ===== -->
+    <record id="group_lik_perm_dashboard" model="res.groups">
+        <field name="name">Tableau de bord</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">10</field>
+        <field name="lik_description">Accès au tableau de bord d'activité de la plateforme.</field>
+    </record>
+
+    <record id="group_lik_perm_orders_view" model="res.groups">
+        <field name="name">Consulter les commandes</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">20</field>
+        <field name="lik_description">Lecture des commandes, lignes de commande, courses et demandes de livraison.</field>
+    </record>
+
+    <record id="group_lik_perm_orders_manage" model="res.groups">
+        <field name="name">Gérer les commandes</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">30</field>
+        <field name="lik_description">Création, modification et affectation des commandes et courses.</field>
+        <field name="implied_ids" eval="[Command.link(ref('group_lik_perm_orders_view'))]"/>
+    </record>
+
+    <record id="group_lik_perm_catalog_view" model="res.groups">
+        <field name="name">Consulter le catalogue</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">40</field>
+        <field name="lik_description">Lecture des produits et catégories.</field>
+    </record>
+
+    <record id="group_lik_perm_catalog_manage" model="res.groups">
+        <field name="name">Gérer le catalogue</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">50</field>
+        <field name="lik_description">Création, modification et archivage des produits et catégories.</field>
+        <field name="implied_ids" eval="[Command.link(ref('group_lik_perm_catalog_view'))]"/>
+    </record>
+
+    <record id="group_lik_perm_network_view" model="res.groups">
+        <field name="name">Consulter le réseau</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">60</field>
+        <field name="lik_description">Lecture des comptes plateforme, livreurs, flottes et plages horaires.</field>
+    </record>
+
+    <record id="group_lik_perm_network_manage" model="res.groups">
+        <field name="name">Gérer le réseau</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">70</field>
+        <field name="lik_description">Modification des comptes plateforme, livreurs, flottes et plages horaires.</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_lik_perm_network_view'))]"/>
+    </record>
+
+    <record id="group_lik_perm_kyc_manage" model="res.groups">
+        <field name="name">Valider les comptes (KYC)</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">80</field>
+        <field name="lik_description">Validation des comptes fournisseurs et sociétés, consultation des pièces KYC.</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_lik_perm_network_view'))]"/>
+    </record>
+
+    <record id="group_lik_perm_finance_view" model="res.groups">
+        <field name="name">Consulter la finance</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">90</field>
+        <field name="lik_description">Lecture des transactions de paiement et retraits portefeuille.</field>
+    </record>
+
+    <record id="group_lik_perm_finance_manage" model="res.groups">
+        <field name="name">Gérer la finance</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">100</field>
+        <field name="lik_description">Traitement des transactions et des retraits portefeuille.</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_lik_perm_finance_view'))]"/>
+    </record>
+
+    <record id="group_lik_perm_supervision_view" model="res.groups">
+        <field name="name">Consulter la supervision</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">110</field>
+        <field name="lik_description">Lecture des notifications, du journal d'audit et des règles d'annulation.</field>
+    </record>
+
+    <record id="group_lik_perm_notifications_manage" model="res.groups">
+        <field name="name">Gérer les notifications</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">120</field>
+        <field name="lik_description">Envoi et supervision des notifications, test du canal d'envoi.</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_lik_perm_supervision_view'))]"/>
+    </record>
+
+    <record id="group_lik_perm_backend_global" model="res.groups">
+        <field name="name">Accès global aux dossiers</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">140</field>
+        <field name="lik_description">Voir les enregistrements de tous les comptes plateforme. Accordé par le rôle Administrateur.</field>
+    </record>
+
+    <record id="group_lik_perm_admin_manage" model="res.groups">
+        <field name="name">Administrer la plateforme</field>
+        <field name="privilege_id" ref="privilege_lik_permissions"/>
+        <field name="lik_is_permission_group" eval="True"/>
+        <field name="lik_sequence">130</field>
+        <field name="lik_description">Accès aux utilisateurs Odoo, aux comptes plateforme et aux paramètres (règles d'annulation, plages horaires).</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_erp_manager')), Command.link(ref('group_lik_perm_network_view'))]"/>
+    </record>
+
+    <!-- ===== Rôles métier ===== -->
     <record id="group_lik_client" model="res.groups">
-        <field name="name">Lik / Client</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="name">Client</field>
+        <field name="privilege_id" ref="privilege_lik_roles"/>
+        <field name="lik_is_role_group" eval="True"/>
+        <field name="lik_role_code">client</field>
+        <field name="lik_sequence">10</field>
+        <field name="lik_description">Client final : commandes, catalogue et portefeuille.</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_lik_perm_orders_view')), Command.link(ref('group_lik_perm_catalog_view')), Command.link(ref('group_lik_perm_finance_view'))]"/>
     </record>
 
     <record id="group_lik_fournisseur" model="res.groups">
-        <field name="name">Lik / Fournisseur</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="name">Fournisseur</field>
+        <field name="privilege_id" ref="privilege_lik_roles"/>
+        <field name="lik_is_role_group" eval="True"/>
+        <field name="lik_role_code">fournisseur</field>
+        <field name="lik_sequence">20</field>
+        <field name="lik_description">Fournisseur : catalogue, commandes, réseau et finance.</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_lik_perm_orders_view')), Command.link(ref('group_lik_perm_orders_manage')), Command.link(ref('group_lik_perm_catalog_view')), Command.link(ref('group_lik_perm_catalog_manage')), Command.link(ref('group_lik_perm_network_view')), Command.link(ref('group_lik_perm_finance_view'))]"/>
     </record>
 
     <record id="group_lik_livreur" model="res.groups">
-        <field name="name">Lik / Livreur</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="name">Livreur</field>
+        <field name="privilege_id" ref="privilege_lik_roles"/>
+        <field name="lik_is_role_group" eval="True"/>
+        <field name="lik_role_code">livreur</field>
+        <field name="lik_sequence">30</field>
+        <field name="lik_description">Livreur : missions, réseau et portefeuille.</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_lik_perm_orders_view')), Command.link(ref('group_lik_perm_network_view')), Command.link(ref('group_lik_perm_finance_view'))]"/>
     </record>
 
     <record id="group_lik_societe" model="res.groups">
-        <field name="name">Lik / Société de livraison</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="name">Société de livraison</field>
+        <field name="privilege_id" ref="privilege_lik_roles"/>
+        <field name="lik_is_role_group" eval="True"/>
+        <field name="lik_role_code">societe</field>
+        <field name="lik_sequence">40</field>
+        <field name="lik_description">Société de livraison : suivi des courses, flotte et finance.</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('group_lik_perm_orders_view')), Command.link(ref('group_lik_perm_orders_manage')), Command.link(ref('group_lik_perm_network_view')), Command.link(ref('group_lik_perm_finance_view'))]"/>
     </record>
 
     <record id="group_lik_admin" model="res.groups">
-        <field name="name">Lik / Administrateur plateforme</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="name">Administrateur plateforme</field>
+        <field name="privilege_id" ref="privilege_lik_roles"/>
+        <field name="lik_is_role_group" eval="True"/>
+        <field name="lik_role_code">admin</field>
+        <field name="lik_sequence">90</field>
+        <field name="lik_description">Administrateur : toutes les permissions et accès aux paramètres Odoo.</field>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_user')), Command.link(ref('base.group_system')), Command.link(ref('group_lik_perm_dashboard')), Command.link(ref('group_lik_perm_backend_global')), Command.link(ref('group_lik_perm_orders_view')), Command.link(ref('group_lik_perm_orders_manage')), Command.link(ref('group_lik_perm_catalog_view')), Command.link(ref('group_lik_perm_catalog_manage')), Command.link(ref('group_lik_perm_network_view')), Command.link(ref('group_lik_perm_network_manage')), Command.link(ref('group_lik_perm_kyc_manage')), Command.link(ref('group_lik_perm_finance_view')), Command.link(ref('group_lik_perm_finance_manage')), Command.link(ref('group_lik_perm_supervision_view')), Command.link(ref('group_lik_perm_notifications_manage')), Command.link(ref('group_lik_perm_admin_manage'))]"/>
+    </record>
+
+    <!--
+        Accès global aux dossiers.
+
+        Les rules d'enregistrement (ir_rule.xml) sont liees aux 4 groupes de
+        role metier et OR-ees entre elles ; un utilisateur qui ne appartient a
+        aucun de ces groupes n'est pas filtre. Ce groupe est l'echappatoire
+        accorde aux profils de supervision : il est OR- avec les rules
+        "Mes donnees", donc un staff cumulant un role et ce groupe voit tout.
+
+        Il n'est implicite d'aucun role client/fournisseur/livreur/societe.
+    -->
+    <record id="group_lik_perm_network_manage" model="res.groups">
+        <field name="implied_ids" eval="[Command.link(ref('group_lik_perm_backend_global'))]"/>
+    </record>
+    <record id="group_lik_perm_kyc_manage" model="res.groups">
+        <field name="implied_ids" eval="[Command.link(ref('group_lik_perm_backend_global'))]"/>
+    </record>
+    <record id="group_lik_perm_finance_manage" model="res.groups">
+        <field name="implied_ids" eval="[Command.link(ref('group_lik_perm_backend_global'))]"/>
+    </record>
+    <record id="group_lik_perm_supervision_view" model="res.groups">
+        <field name="implied_ids" eval="[Command.link(ref('group_lik_perm_backend_global'))]"/>
+    </record>
+    <record id="group_lik_perm_notifications_manage" model="res.groups">
+        <field name="implied_ids" eval="[Command.link(ref('group_lik_perm_backend_global'))]"/>
+    </record>
+    <record id="group_lik_perm_admin_manage" model="res.groups">
+        <field name="implied_ids" eval="[Command.link(ref('group_lik_perm_backend_global'))]"/>
     </record>
 </odoo>

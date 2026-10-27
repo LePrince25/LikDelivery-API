@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Role + granular permissions, added to Settings / Users form. -->
+    <record id="view_users_form_likdelivery" model="ir.ui.view">
+        <field name="name">res.users.form.likdelivery</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <page name="access_rights" position="after">
+                <page string="Rôle &amp; Permissions"
+                      name="lik_role_permissions"
+                      groups="base.group_erp_manager">
+                    <group>
+                        <group string="Rôle plateforme">
+                            <field name="lik_role_group_id"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                        </group>
+                        <group string="Permissions effectives">
+                            <field name="lik_effective_permission_ids"
+                                   widget="many2many_tags"
+                                   readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Permissions accordées par le rôle">
+                        <field name="lik_role_permission_ids"
+                               widget="many2many_tags"
+                               readonly="1"
+                               nolabel="1"
+                               colspan="2"/>
+                    </group>
+                    <group string="Permissions supplémentaires">
+                        <field name="lik_extra_permission_ids"
+                               widget="many2many_checkboxes"
+                               nolabel="1"
+                               colspan="2"
+                               domain="[('lik_is_permission_group', '=', True)]"/>
+                    </group>
+                    <div class="text-muted">
+                        Le rôle accorde automatiquement toutes ses permissions.
+                        Cochez des permissions supplémentaires pour étendre les accès
+                        de cet utilisateur au-delà de son rôle.
+                    </div>
+                </page>
+            </page>
+        </field>
+    </record>
+
+</odoo>

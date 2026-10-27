@@ -22,15 +22,17 @@ services:
       bash -c "pip3 install -q 'minio>=7.2.0' 'Jinja2>=3.1.0' 'weasyprint>=62.0' 2>/dev/null || true; exec odoo -d db-likdelivery"
 
   minio:
-    image: minio/minio:RELEASE.2024-06-13T22-53-53Z
+    image: rustfs/rustfs:latest
     restart: unless-stopped
-    command: server /data --console-address ":9001"
+    command: ["rustfs", "/data"]
     ports:
       - "9413:9000"
       - "9414:9001"
     environment:
-      MINIO_ROOT_USER: likdelivery
-      MINIO_ROOT_PASSWORD: likdelivery_minio_secret
+      RUSTFS_ACCESS_KEY: likdelivery
+      RUSTFS_SECRET_KEY: likdelivery_minio_secret
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
     volumes:
       - likdelivery-minio-data:/data
 

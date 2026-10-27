@@ -1,5 +1,6 @@
 from . import lik_utils
 from . import lik_user
+from . import lik_security
 from . import lik_product
 from . import lik_opening_hour
 from . import lik_fleet

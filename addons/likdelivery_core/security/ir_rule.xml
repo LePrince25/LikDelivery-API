@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Record rules LikDelivery
+
+        Semantique Odoo verifiee (odoo/addons/base/models/ir_rule.py,
+        _compute_domain) :
+          * les rules d'un meme utilisateur sont OR-ees entre elles ;
+          * une rule sans groupe est AND-ee a tout le monde (donc jamais
+            utilisee ici, elle aurait verrouille les admins) ;
+          * un utilisateur qui ne matche AUCUNE rule du modele n'est pas
+            filtre.
+
+        Consequence : les rules restrictives sont liees aux 4 roles metiers
+        (client, fournisseur, livreur, societe). Le role Administrateur et les
+        comptes de supervision ne sont lies a aucune rule restrictive, ou
+        benefitent de la rule "global" OR-ee, donc ils conservent l'acces
+        complet. L'API /api/v1/* tourne en sudo() : elle n'est pas impactee.
+
+        Les domaines portent sur des Many2one "res.partner" et utilisent donc
+        user.partner_id.id.
+    -->
+
+    <!-- ===== Commandes ===== -->
+    <record id="rule_lik_order_own" model="ir.rule">
+        <field name="name">Mes commandes</field>
+        <field name="model_id" ref="model_likdelivery_order"/>
+        <field name="domain_force">[
+            '|', '|', '|',
+            ('client_id', '=', user.partner_id.id),
+            ('supplier_id', '=', user.partner_id.id),
+            ('run_ids.livreur_id', '=', user.partner_id.id),
+            ('preferred_societe_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_order_global" model="ir.rule">
+        <field name="name">Commandes : acces global</field>
+        <field name="model_id" ref="model_likdelivery_order"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Lignes de commande ===== -->
+    <record id="rule_lik_order_line_own" model="ir.rule">
+        <field name="name">Mes lignes de commande</field>
+        <field name="model_id" ref="model_likdelivery_order_line"/>
+        <field name="domain_force">[
+            '|', '|', '|',
+            ('order_id.client_id', '=', user.partner_id.id),
+            ('order_id.supplier_id', '=', user.partner_id.id),
+            ('order_id.run_ids.livreur_id', '=', user.partner_id.id),
+            ('order_id.preferred_societe_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_order_line_global" model="ir.rule">
+        <field name="name">Lignes de commande : acces global</field>
+        <field name="model_id" ref="model_likdelivery_order_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Courses / missions ===== -->
+    <record id="rule_lik_delivery_run_own" model="ir.rule">
+        <field name="name">Mes courses</field>
+        <field name="model_id" ref="model_likdelivery_delivery_run"/>
+        <field name="domain_force">[
+            '|', '|', '|',
+            ('livreur_id', '=', user.partner_id.id),
+            ('order_id.client_id', '=', user.partner_id.id),
+            ('order_id.supplier_id', '=', user.partner_id.id),
+            ('livreur_id.lik_employer_societe_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_delivery_run_global" model="ir.rule">
+        <field name="name">Courses : acces global</field>
+        <field name="model_id" ref="model_likdelivery_delivery_run"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Courses colis ===== -->
+    <record id="rule_lik_courier_request_own" model="ir.rule">
+        <field name="name">Mes courses colis</field>
+        <field name="model_id" ref="model_likdelivery_courier_request"/>
+        <field name="domain_force">[
+            '|',
+            ('client_id', '=', user.partner_id.id),
+            ('livreur_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_courier_request_global" model="ir.rule">
+        <field name="name">Courses colis : acces global</field>
+        <field name="model_id" ref="model_likdelivery_courier_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Paniers ===== -->
+    <record id="rule_lik_cart_session_own" model="ir.rule">
+        <field name="name">Mes paniers</field>
+        <field name="model_id" ref="model_likdelivery_cart_session"/>
+        <field name="domain_force">[
+            '|',
+            ('client_id', '=', user.partner_id.id),
+            ('supplier_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_cart_session_global" model="ir.rule">
+        <field name="name">Paniers : acces global</field>
+        <field name="model_id" ref="model_likdelivery_cart_session"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Comptes plateforme ===== -->
+    <record id="rule_lik_user_own" model="ir.rule">
+        <field name="name">Mon compte plateforme</field>
+        <field name="model_id" ref="model_likdelivery_user"/>
+        <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_user_global" model="ir.rule">
+        <field name="name">Comptes plateforme : acces global</field>
+        <field name="model_id" ref="model_likdelivery_user"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Produits =====
+        Lecture volontairement non filtree : le catalogue est commun a toute
+        la plateforme. Seule l'ecriture est reservee au fournisseur proprietaire. -->
+    <record id="rule_lik_product_own_write" model="ir.rule">
+        <field name="name">Mes produits (ecriture)</field>
+        <field name="model_id" ref="model_likdelivery_product"/>
+        <field name="perm_read" eval="False"/>
+        <field name="domain_force">[('supplier_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_product_global" model="ir.rule">
+        <field name="name">Produits : ecriture globale</field>
+        <field name="model_id" ref="model_likdelivery_product"/>
+        <field name="perm_read" eval="False"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Rattachements de livreurs ===== -->
+    <record id="rule_lik_shop_driver_own" model="ir.rule">
+        <field name="name">Mes livreurs de boutique</field>
+        <field name="model_id" ref="model_likdelivery_shop_driver"/>
+        <field name="domain_force">[
+            '|',
+            ('supplier_id', '=', user.partner_id.id),
+            ('livreur_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_shop_driver_global" model="ir.rule">
+        <field name="name">Livreurs de boutique : acces global</field>
+        <field name="model_id" ref="model_likdelivery_shop_driver"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <record id="rule_lik_fleet_driver_own" model="ir.rule">
+        <field name="name">Ma flotte</field>
+        <field name="model_id" ref="model_likdelivery_fleet_driver"/>
+        <field name="domain_force">[
+            '|',
+            ('societe_id', '=', user.partner_id.id),
+            ('livreur_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_fleet_driver_global" model="ir.rule">
+        <field name="name">Flotte : acces global</field>
+        <field name="model_id" ref="model_likdelivery_fleet_driver"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Positions GPS ===== -->
+    <record id="rule_lik_driver_location_own" model="ir.rule">
+        <field name="name">Mes positions</field>
+        <field name="model_id" ref="model_likdelivery_driver_location"/>
+        <field name="domain_force">[
+            '|',
+            ('livreur_id', '=', user.partner_id.id),
+            ('livreur_id.lik_employer_societe_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_driver_location_global" model="ir.rule">
+        <field name="name">Positions : acces global</field>
+        <field name="model_id" ref="model_likdelivery_driver_location"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Notifications ===== -->
+    <record id="rule_lik_notification_own" model="ir.rule">
+        <field name="name">Mes notifications</field>
+        <field name="model_id" ref="model_likdelivery_notification"/>
+        <field name="domain_force">[('user_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_notification_global" model="ir.rule">
+        <field name="name">Notifications : acces global</field>
+        <field name="model_id" ref="model_likdelivery_notification"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Retraits portefeuille ===== -->
+    <record id="rule_lik_wallet_withdrawal_own" model="ir.rule">
+        <field name="name">Mes retraits</field>
+        <field name="model_id" ref="model_likdelivery_wallet_withdrawal"/>
+        <field name="domain_force">[('user_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_wallet_withdrawal_global" model="ir.rule">
+        <field name="name">Retraits : acces global</field>
+        <field name="model_id" ref="model_likdelivery_wallet_withdrawal"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Transactions de paiement ===== -->
+    <record id="rule_lik_payment_transaction_own" model="ir.rule">
+        <field name="name">Mes paiements</field>
+        <field name="model_id" ref="model_likdelivery_payment_transaction"/>
+        <field name="domain_force">[
+            '|', '|', '|', '|',
+            ('order_id.client_id', '=', user.partner_id.id),
+            ('order_id.supplier_id', '=', user.partner_id.id),
+            ('order_id.run_ids.livreur_id', '=', user.partner_id.id),
+            ('courier_request_id.client_id', '=', user.partner_id.id),
+            ('courier_request_id.livreur_id', '=', user.partner_id.id),
+        ]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_payment_transaction_global" model="ir.rule">
+        <field name="name">Paiements : acces global</field>
+        <field name="model_id" ref="model_likdelivery_payment_transaction"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!-- ===== Plages horaires ===== -->
+    <record id="rule_lik_opening_hour_own" model="ir.rule">
+        <field name="name">Mes horaires</field>
+        <field name="model_id" ref="model_likdelivery_opening_hour"/>
+        <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[
+            Command.link(ref('likdelivery_core.group_lik_client')),
+            Command.link(ref('likdelivery_core.group_lik_fournisseur')),
+            Command.link(ref('likdelivery_core.group_lik_livreur')),
+            Command.link(ref('likdelivery_core.group_lik_societe')),
+        ]"/>
+    </record>
+
+    <record id="rule_lik_opening_hour_global" model="ir.rule">
+        <field name="name">Horaires : acces global</field>
+        <field name="model_id" ref="model_likdelivery_opening_hour"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[Command.link(ref('likdelivery_core.group_lik_perm_backend_global'))]"/>
+    </record>
+
+    <!--
+        Modeles sans rule : likdelivery.product.category, likdelivery.audit.log
+        et likdelivery.cancellation.rule. Leur acces est deja borne par les ACL
+        (supervision / administration) et n'est accorde a aucun role metier.
+    -->
+</odoo>

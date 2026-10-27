@@ -129,6 +129,12 @@ class LikRegisterController(http.Controller):
         User = http.request.env["likdelivery.user"].sudo()
         if User.search_count([("phone", "=", data["phone"])]):
             raise_error(CONFLICT, "Telephone deja utilise")
+        # Odoo enforces UNIQUE(res_users.login); a phone already held by an
+        # Odoo account cannot become a platform login.
+        if http.request.env["res.users"].sudo().search_count(
+            [("login", "=", data["phone"])]
+        ):
+            raise_error(CONFLICT, "Telephone deja utilise")
         first = (data.get("first_name") or "").strip()
         last = (data.get("last_name") or "").strip()
         user = User.create(

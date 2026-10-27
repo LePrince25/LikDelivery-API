@@ -8,3 +8,5 @@ from . import test_wallet
 from . import test_payments
 from . import test_profile
 from . import test_admin
+from . import test_access_rules
+from . import test_erp_user_provisioning

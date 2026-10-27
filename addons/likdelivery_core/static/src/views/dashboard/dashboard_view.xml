@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="likdelivery_core.DashboardView">
+    <div class="o_lik_dashboard d-flex flex-column gap-3">
+        <div class="d-flex align-items-center justify-content-between">
+            <h2 class="h4 mb-0">Tableau de bord Livraison</h2>
+            <button type="button" class="btn btn-sm btn-secondary"
+                    t-on-click="loadData"
+                    title="Recharger les indicateurs">
+                Recharger
+            </button>
+        </div>
+
+        <div t-if="!state.data and state.loading" class="text-muted p-4">
+            Chargement des indicateurs…
+        </div>
+
+        <t t-if="state.data">
+            <div class="row g-2">
+                <t t-foreach="cards" t-as="card" t-key="card.key">
+                    <div class="col-6 col-md-4 col-lg-3 col-xl">
+                        <button type="button"
+                                class="o_lik_kpi w-100 text-start"
+                                t-att-title="'Ouvrir ' + card.label"
+                                t-on-click="() => this.openModel(card.model, card.label, card.domain)">
+                            <span class="o_lik_kpi_value" t-out="format(card.value)"/>
+                            <span class="o_lik_kpi_label" t-out="card.label"/>
+                        </button>
+                    </div>
+                </t>
+            </div>
+
+            <section class="card o_lik_panel">
+                <div class="card-header">Commandes par jour (14 derniers jours)</div>
+                <div class="card-body">
+                    <div t-if="!state.data.orders_by_day.length" class="text-muted">
+                        Aucune commande sur la période.
+                    </div>
+                    <div t-else="" class="o_lik_chart">
+                        <t t-foreach="state.data.orders_by_day" t-as="day" t-key="day_index">
+                            <div class="o_lik_chart_col">
+                                <div class="o_lik_chart_track">
+                                    <div class="o_lik_chart_bar"
+                                         t-att-style="'height: ' + barHeight(day.total)"
+                                         t-att-title="day.label + ' — ' + day.count + ' commande(s), ' + format(day.total) + ' XOF'"/>
+                                </div>
+                                <span class="o_lik_chart_axis" t-out="day.label"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </section>
+
+            <div class="row g-2">
+                <section class="col-12 col-lg-5">
+                    <div class="card o_lik_panel h-100">
+                        <div class="card-header">Commandes par statut</div>
+                        <div class="card-body p-0">
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                    <tr><th>Statut</th><th class="text-end">Commandes</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="statuses" t-as="row" t-key="row.state">
+                                        <td t-out="row.label"/>
+                                        <td class="text-end" t-out="format(row.count)"/>
+                                    </tr>
+                                    <tr t-if="!statuses.length">
+                                        <td colspan="2" class="text-muted">Aucune commande.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="col-12 col-lg-7">
+                    <div class="card o_lik_panel h-100">
+                        <div class="card-header">Top 5 fournisseurs</div>
+                        <div class="card-body p-0">
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Fournisseur</th>
+                                        <th class="text-end">Commandes</th>
+                                        <th class="text-end">Revenu (XOF)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="state.data.top_suppliers" t-as="sup" t-key="sup_index">
+                                        <td t-out="sup.name"/>
+                                        <td class="text-end" t-out="format(sup.orders)"/>
+                                        <td class="text-end" t-out="format(sup.revenue)"/>
+                                    </tr>
+                                    <tr t-if="!state.data.top_suppliers.length">
+                                        <td colspan="3" class="text-muted">Aucun fournisseur.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </div>
+</t>
+
+</templates>

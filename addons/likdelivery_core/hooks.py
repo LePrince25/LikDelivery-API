@@ -154,5 +154,5 @@ def _post_init_seed_demo(env):
             "name": "Lik Admin",
             "login": "likadmin",
             "password": "admin123",
-            "group_ids": [(6, 0, [env.ref("likdelivery_core.group_lik_admin").id])],
+            "lik_role_group_id": env.ref("likdelivery_core.group_lik_admin").id,
         })
