@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<!--
+    Panneaux du tableau de bord Livraison. Chaque primitive rend sa propre
+    carte : le gabarit parent ne fait que les disposer. Les tracés sont en SVG
+    écrit à la main, sans bibliothèque de graphiques, comme côté PWA.
+-->
+
+<t t-name="likdelivery_core.Sparkline">
+    <svg t-if="geometry" class="lik-dash-spark" viewBox="0 0 100 32" width="100" height="32"
+         preserveAspectRatio="none" role="img" aria-label="Tendance de la période">
+        <defs>
+            <linearGradient t-att-id="gradientId" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" t-att-stop-color="geometry.stroke" stop-opacity="0.35"/>
+                <stop offset="100%" t-att-stop-color="geometry.stroke" stop-opacity="0"/>
+            </linearGradient>
+        </defs>
+        <path t-att-d="geometry.area" t-att-fill="'url(#' + gradientId + ')'"/>
+        <path t-att-d="geometry.path" fill="none" t-att-stroke="geometry.stroke"
+              stroke-width="1.5" vector-effect="non-scaling-stroke"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <circle t-att-cx="geometry.last[0]" t-att-cy="geometry.last[1]" r="2"
+                t-att-fill="geometry.stroke"/>
+    </svg>
+</t>
+
+<t t-name="likdelivery_core.AreaChart">
+    <section class="lik-dash-panel lik-dash-panel--wide">
+        <header class="lik-dash-panel-head">
+            <h2 t-esc="props.chart.title"/>
+            <p t-if="props.chart.subtitle" class="lik-dash-panel-sub" t-esc="props.chart.subtitle"/>
+        </header>
+        <div class="lik-dash-panel-body">
+            <div class="lik-dash-area">
+                <svg class="lik-dash-area-svg" viewBox="0 0 100 240" width="100%" height="240"
+                     preserveAspectRatio="none" role="img"
+                     t-att-aria-label="props.chart.series.map(s => s.name).join(', ')">
+                    <defs>
+                        <t t-foreach="series" t-as="s" t-key="s.index">
+                            <linearGradient t-att-id="gradientPrefix + '-' + s.index"
+                                            x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" t-att-stop-color="s.color" stop-opacity="0.38"/>
+                                <stop offset="100%" t-att-stop-color="s.color" stop-opacity="0"/>
+                            </linearGradient>
+                        </t>
+                    </defs>
+                    <line t-foreach="grid" t-as="g" t-key="g.y" x1="14" x2="96"
+                          t-att-y1="g.y" t-att-y2="g.y" stroke="#E2E8F0" stroke-width="1"
+                          stroke-dasharray="4 4" opacity="0.7"
+                          vector-effect="non-scaling-stroke"/>
+                    <line t-if="state.hover !== null" class="lik-dash-area-cursor"
+                          t-att-x1="14 + (state.hover * (82 / Math.max(1, length - 1)))"
+                          t-att-x2="14 + (state.hover * (82 / Math.max(1, length - 1)))"
+                          y1="16" y2="216" stroke="#CBD5E1" stroke-width="1"
+                          vector-effect="non-scaling-stroke"/>
+                    <path t-foreach="series" t-as="s" t-key="s.index" t-att-d="s.area"
+                          t-att-fill="'url(#' + gradientPrefix + '-' + s.index + ')'"/>
+                    <path t-foreach="series" t-as="s" t-key="s.index" t-att-d="s.path" fill="none"
+                          t-att-stroke="s.color" stroke-width="2"
+                          vector-effect="non-scaling-stroke"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+
+                <span t-foreach="grid" t-as="g" t-key="g.y" class="lik-dash-area-axis"
+                      t-attf-style="top: {{ g.top }}" t-esc="g.label"/>
+                <span t-foreach="ticks" t-as="tick" t-key="tick_index" class="lik-dash-area-tick"
+                      t-attf-style="left: {{ tick.x }}" t-esc="tick.label"/>
+
+                <span t-foreach="marks" t-as="mark" t-key="mark.index" class="lik-dash-area-mark"
+                      t-attf-style="left: {{ mark.x }}; top: {{ mark.y }}; background-color: {{ mark.color }}"/>
+
+                <div class="lik-dash-area-cols" t-on-mouseleave="clear">
+                    <button t-foreach="columns" t-as="col" t-key="col" type="button"
+                            class="lik-dash-area-col"
+                            t-att-aria-label="props.chart.labels[col]"
+                            t-on-mouseenter="() => this.setHover(col)"
+                            t-on-focus="() => this.setHover(col)"/>
+                </div>
+
+                <div t-if="tooltip" class="lik-dash-tooltip"
+                     t-attf-style="left: {{ tooltip.left }}">
+                    <div class="lik-dash-tooltip-head" t-esc="tooltip.label"/>
+                    <div t-foreach="tooltip.rows" t-as="row" t-key="row.index"
+                         class="lik-dash-tooltip-row">
+                        <span class="lik-dash-dot" t-attf-style="background-color: {{ row.color }}"/>
+                        <span class="lik-dash-tooltip-name" t-esc="row.name"/>
+                        <span class="lik-dash-tooltip-value" t-esc="row.value"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lik-dash-legend">
+                <span t-foreach="series" t-as="s" t-key="s.index" class="lik-dash-legend-item">
+                    <span class="lik-dash-dot" t-attf-style="background-color: {{ s.color }}"/>
+                    <t t-esc="s.name"/>
+                    <span class="lik-dash-legend-total" t-esc="s.total"/>
+                </span>
+            </div>
+        </div>
+    </section>
+</t>
+
+<t t-name="likdelivery_core.Donut">
+    <section class="lik-dash-panel lik-dash-panel--slim">
+        <header class="lik-dash-panel-head">
+            <h2 t-esc="props.chart.title"/>
+            <p t-if="props.chart.subtitle" class="lik-dash-panel-sub" t-esc="props.chart.subtitle"/>
+        </header>
+        <div class="lik-dash-panel-body lik-dash-donut-body">
+            <div class="lik-dash-donut-ring">
+                <svg class="lik-dash-donut" viewBox="0 0 150 150" width="150" height="150"
+                     role="img" aria-label="Répartition">
+                    <circle t-att-cx="geometry.center" t-att-cy="geometry.center"
+                            t-att-r="geometry.radius" fill="none" stroke="#E2E8F0"
+                            t-att-stroke-width="geometry.thickness"/>
+                    <circle t-foreach="geometry.slices" t-as="slice" t-key="slice.label"
+                            t-att-cx="geometry.center" t-att-cy="geometry.center"
+                            t-att-r="geometry.radius" fill="none"
+                            t-att-stroke="slice.color" t-att-stroke-width="geometry.thickness"
+                            t-att-stroke-dasharray="slice.dasharray"
+                            t-att-stroke-dashoffset="slice.dashoffset"/>
+                </svg>
+                <div class="lik-dash-donut-center">
+                    <span class="lik-dash-donut-value" t-esc="props.chart.center_value"/>
+                    <span class="lik-dash-donut-label" t-esc="props.chart.center_label"/>
+                </div>
+            </div>
+            <ul class="lik-dash-donut-legend">
+                <li t-foreach="geometry.slices" t-as="slice" t-key="slice.label">
+                    <span class="lik-dash-dot" t-attf-style="background-color: {{ slice.color }}"/>
+                    <span class="lik-dash-legend-name" t-esc="slice.label"/>
+                    <span class="lik-dash-legend-figure">
+                        <span class="lik-dash-legend-text" t-esc="slice.text"/>
+                        <span class="lik-dash-legend-pct" t-esc="slice.pct + ' %'"/>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </section>
+</t>
+
+<t t-name="likdelivery_core.Allocation">
+    <section class="lik-dash-panel lik-dash-panel--half">
+        <header class="lik-dash-panel-head">
+            <h2 t-esc="props.chart.title"/>
+            <p t-if="props.chart.subtitle" class="lik-dash-panel-sub" t-esc="props.chart.subtitle"/>
+        </header>
+        <div class="lik-dash-panel-body">
+            <ul t-if="items.length" class="lik-dash-alloc">
+                <li t-foreach="items" t-as="item" t-key="item.label" class="lik-dash-alloc-item">
+                    <div class="lik-dash-alloc-line">
+                        <span class="lik-dash-alloc-label" t-esc="item.label"/>
+                        <span class="lik-dash-alloc-value">
+                            <span t-esc="item.text"/>
+                            <span class="lik-dash-alloc-pct" t-esc="item.pct + ' %'"/>
+                        </span>
+                    </div>
+                    <div class="lik-dash-alloc-track">
+                        <span class="lik-dash-alloc-bar"
+                              t-attf-style="width: {{ item.width }}; background-color: {{ item.color }}"/>
+                    </div>
+                </li>
+            </ul>
+            <p t-else="" class="lik-dash-panel-empty">Aucune donnée sur la période.</p>
+        </div>
+    </section>
+</t>
+
+<t t-name="likdelivery_core.Pairs">
+    <section class="lik-dash-panel lik-dash-panel--half">
+        <header class="lik-dash-panel-head">
+            <h2 t-esc="props.chart.title"/>
+            <p t-if="props.chart.subtitle" class="lik-dash-panel-sub" t-esc="props.chart.subtitle"/>
+        </header>
+        <div class="lik-dash-panel-body">
+            <div class="lik-dash-legend">
+                <span t-foreach="legend" t-as="entry" t-key="entry.name" class="lik-dash-legend-item">
+                    <span class="lik-dash-dot" t-attf-style="background-color: {{ entry.color }}"/>
+                    <t t-esc="entry.name"/>
+                </span>
+            </div>
+            <div class="lik-dash-pairs">
+                <div t-foreach="groups" t-as="group" t-key="group.label" class="lik-dash-pair">
+                    <div class="lik-dash-pair-bars">
+                        <span class="lik-dash-bar lik-dash-bar--a" t-attf-style="height: {{ group.a }}"
+                              t-att-title="group.label + ' — ' + aName + ' : ' + group.aText"/>
+                        <span class="lik-dash-bar lik-dash-bar--b" t-attf-style="height: {{ group.b }}"
+                              t-att-title="group.label + ' — ' + bName + ' : ' + group.bText"/>
+                    </div>
+                    <span class="lik-dash-pair-label" t-esc="group.label"/>
+                </div>
+            </div>
+        </div>
+    </section>
+</t>
+
+</templates>

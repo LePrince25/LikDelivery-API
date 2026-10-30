@@ -3,6 +3,7 @@ import logging
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from odoo import _, api, fields, models
+from odoo.api import SUPERUSER_ID
 from odoo.exceptions import AccessError, ValidationError
 from odoo.fields import Command
 
@@ -179,6 +180,11 @@ class LikUser(models.Model):
         single-sourced. A login already held by another contact is skipped with
         a warning instead of breaking the signup flow.
         """
+        # An auth="none" request (/auth/register) carries no env.user and no
+        # env.company; the mirror reaches both through access checks, attachment
+        # computes and the company_id/company_ids defaults, and dies on
+        # "Expected singleton: res.users()". Rebase on the superuser instead.
+        self = self.with_user(SUPERUSER_ID)
         ResUsers = self.env["res.users"].sudo().with_context(
             mail_create_nolog=True,
             mail_notrack=True,

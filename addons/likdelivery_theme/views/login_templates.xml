@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Les xpath sont appliques sequentiellement sur l'arbre deja muté :
+         tout ce qui cible `.card-body` doit donc preceder son renommage. -->
+    <template id="lik_login_layout" inherit_id="web.login_layout" priority="90">
+        <xpath expr="//t[@t-set='body_classname']" position="replace">
+            <t t-set="body_classname" t-value="'lik-login-body'"/>
+        </xpath>
+
+        <xpath expr="//div[hasclass('container')]" position="attributes">
+            <attribute name="class">lik-login-shell</attribute>
+        </xpath>
+
+        <!-- Sans la classe Bootstrap `card`, la regle de web qui peint
+             `.card-body` en blanc (rgba(255,255,255,.9)) ne s'applique plus. -->
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]" position="attributes">
+            <attribute name="t-attf-class">lik-login-card {{login_card_classes}} o_database_list</attribute>
+            <attribute name="style"/>
+        </xpath>
+
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]/div[hasclass('card-body')]/div[1]" position="replace">
+            <div class="lik-login-brand">
+                <img src="/likdelivery_theme/static/img/logo.png" alt="LikDelivery"/>
+                <strong>LikDelivery</strong>
+            </div>
+            <div class="lik-login-heading">
+                <h2>Bienvenue</h2>
+                <p>Connectez-vous a votre espace de pilotage.</p>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]/div[hasclass('card-body')]/div[@t-if='not disable_footer']" position="replace">
+            <div class="lik-login-footer" t-if="not disable_footer">
+                <span>Livraison Express</span>
+                <span>Acces securise</span>
+            </div>
+        </xpath>
+
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]/div[hasclass('card-body')]" position="attributes">
+            <attribute name="class">lik-login-card-body</attribute>
+        </xpath>
+    </template>
+
+</odoo>

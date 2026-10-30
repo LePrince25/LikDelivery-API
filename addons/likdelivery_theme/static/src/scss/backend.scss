@@ -1,0 +1,156 @@
+///
+/// Chrome du backend : navbar, panneaux de vues, listes, formulaires,
+/// kanban et boutons. La palette vient de primary_variables.scss ; les
+/// regles ci-dessous ne gardent que les touches de design que le theme clair
+/// natif d'Odoo ne fournit pas (rayons, pillules de recherche, halo du CTA).
+///
+
+// ---- Barre de navigation -------------------------------------------
+// Barre bleue plate : les entrees n'ont ni fond ni bordure, elles se fondent
+// dans la barre et seuls le texte blanc et le survol les rendent lisibles.
+// Seule la marque (logo + nom) recoit un fond blanc, soude en un seul pastillon.
+.o_main_navbar {
+    box-shadow: 0 2px 10px rgba($o-lik-accent-3, 0.35);
+
+    // %-main-navbar-entry-base est defini dans navbar.variables.scss, donc
+    // evalue AVANT ce theme : son height garde le par defaut d'Odoo (46px) et
+    // deborderait la barre rendu a son padding-v de 6px. Rejoue ici.
+    .o_nav_entry,
+    .o_menu_toggle,
+    .dropdown-toggle:not(.o-dropdown-toggle-custo) {
+        height: calc(var(--o-navbar-height) - 12px);
+        line-height: calc(var(--o-navbar-height) - 12px);
+        border: 0;
+        background: transparent;
+    }
+
+    .o_menu_sections {
+        --NavBar-entry-backgroundColor: transparent;
+        --NavBar-entry-backgroundColor--hover: transparent;
+        --NavBar-entry-backgroundColor--focus: transparent;
+        --NavBar-entry-backgroundColor--active: transparent;
+        --NavBar-entry-color--active: #{$o-lik-bg-1};
+        --NavBar-entry-borderColor-active: transparent;
+
+        .o_nav_entry,
+        .dropdown-toggle:not(.o-dropdown-toggle-custo) {
+            font-weight: 500;
+        }
+    }
+
+    // Les deux elements sont des freres adjacents de la barre flex : chacun
+    // porte une moitie du rayon et ils se touchent, un seul pastillon blanc.
+    .o_menu_brand_logo {
+        height: calc(var(--o-navbar-height) - 12px);
+        padding-left: 0.6rem;
+        background-color: $o-lik-bg-1;
+        border-radius: $o-border-radius 0 0 $o-border-radius;
+    }
+
+    .o_menu_brand {
+        height: calc(var(--o-navbar-height) - 12px);
+        line-height: calc(var(--o-navbar-height) - 12px);
+        padding: 0 0.75rem 0 0.4rem;
+        background-color: $o-lik-bg-1;
+        border-radius: 0 $o-border-radius $o-border-radius 0;
+        color: $o-lik-ink-1;
+        // Taille figee : navbar.scss donne a la marque un 1.2em relatif a la
+        // taille du corps, qui vient de monter. Le nom de l'app reste donc a
+        // son gabarit, lui seul ne suit pas l'agrandissement.
+        font-size: o-to-rem(16px);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+
+        // navbar.scss pose `background: none` au survol de la marque, regle plus
+        // specifique que la precedente : sans ce rappel le pastillon disparait
+        // des que la souris passe dessus.
+        &:hover,
+        &:focus {
+            background-color: $o-lik-bg-1;
+            color: $o-lik-accent-2;
+        }
+    }
+}
+
+// Illustration orange/cyan sur fond transparent : elle pose sur le pastillon
+// blanc de la marque, elle n'a donc aucun fond propre a ajouter.
+.lik-app-logo {
+    height: 22px;
+    width: auto;
+    object-fit: contain;
+}
+
+// ---- Panneau de controle et recherche ------------------------------
+.o_control_panel {
+    .o_searchview {
+        background-color: $o-lik-bg-2;
+        border: 1px solid $o-lik-line;
+        border-radius: 999px;
+        color: $o-lik-ink-1;
+
+        .o_searchview_input::placeholder {
+            color: $o-lik-ink-3;
+        }
+
+        .o_searchview_facet {
+            background-color: rgba($o-lik-accent, 0.12);
+            border-color: rgba($o-lik-accent, 0.35);
+            color: $o-lik-accent-2;
+            border-radius: 999px;
+        }
+    }
+}
+
+// ---- Liste ----------------------------------------------------------
+.o_list_view {
+    table.o_list_table {
+        tbody {
+            tr.o_row:hover,
+            tr.o_row_hover {
+                background-color: rgba($o-lik-accent, 0.05);
+            }
+        }
+    }
+
+    .o_list_selection_box {
+        background-color: rgba($o-lik-accent, 0.1);
+        border-color: $o-lik-accent;
+    }
+}
+
+// ---- Formulaire -----------------------------------------------------
+.o_form_view {
+    .o_form_sheet_bg {
+        background-color: $o-lik-bg-0;
+    }
+
+    .o_form_sheet {
+        background-color: $o-lik-bg-1;
+        border: 1px solid $o-lik-line;
+        border-radius: $o-border-radius-lg;
+        box-shadow: 0 2px 12px rgba($o-lik-ink-1, 0.06);
+    }
+}
+
+// ---- Kanban ---------------------------------------------------------
+.o_kanban_view {
+    .o_kanban_record,
+    .o_kanban_quickcreate {
+        border: 1px solid $o-lik-line;
+        border-radius: $o-border-radius-lg;
+        box-shadow: none;
+
+        &:hover {
+            border-color: rgba($o-lik-accent, 0.5);
+            box-shadow: $o-lik-glow;
+        }
+    }
+}
+
+// ---- Boutons --------------------------------------------------------
+// secondaires et .btn-light se reglent dans primary_variables.scss via
+// $o-btns-bs-override ; il ne reste que le halo bleu du CTA.
+.btn-primary {
+    box-shadow: $o-lik-glow;
+}

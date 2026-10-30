@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="likdelivery_core.Dashboard">
+    <!-- o_action : la classe de deroulement d'une action client. Sans elle, le
+         content-area reste en overflow hidden et le bas du tableau de bord est
+         inatteignable des que l'ecran est plus haut que la fenetre. -->
+    <div t-if="data" t-attf-class="o_action lik-dash{{ state.loading ? ' lik-dash--busy' : '' }}">
+
+        <header class="lik-dash-head">
+            <div class="lik-dash-head-text">
+                <span class="lik-dash-role" t-esc="data.role_label"/>
+                <h1 class="lik-dash-title">
+                    <t t-if="data.user_name">Bonjour <t t-esc="data.user_name"/></t>
+                    <t t-else="">Bonjour</t>
+                </h1>
+                <p class="lik-dash-subtitle" t-esc="data.subtitle"/>
+            </div>
+            <div class="lik-dash-periods" role="group" aria-label="Période observée">
+                <button t-foreach="data.periods" t-as="period" t-key="period.value" type="button"
+                        t-attf-class="lik-dash-period{{ period.value === state.days ? ' lik-dash-period--active' : '' }}"
+                        t-esc="period.label"
+                        t-on-click="() => this.setPeriod(period.value)"/>
+            </div>
+        </header>
+
+        <div class="lik-dash-banner" t-if="data.needs_validation">
+            <i class="fa fa-info-circle" role="img" aria-label="Information"/>
+            <span>Votre compte n'est pas encore validé par l'administration : les livraisons restent bloquées tant que vos pièces ne sont pas contrôlées.</span>
+        </div>
+
+        <!-- === Indicateurs : valeur, variation, tendance =============== -->
+        <section class="lik-dash-stats">
+            <button t-foreach="data.stats" t-as="stat" t-key="stat.label" type="button"
+                    t-attf-class="lik-dash-kpi lik-dash-kpi--{{ stat.tone }}{{ stat.action_id ? ' lik-dash-kpi--link' : ' lik-dash-kpi--static' }}"
+                    t-on-click="() => this.openStat(stat)">
+                <span class="lik-dash-kpi-top">
+                    <span class="lik-dash-kpi-label" t-esc="stat.label"/>
+                    <span t-if="stat.delta" t-attf-class="lik-dash-pill lik-dash-pill--{{ stat.delta.direction }}">
+                        <svg class="lik-dash-pill-arrow" viewBox="0 0 12 12" fill="none"
+                             stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path t-if="stat.delta.direction === 'flat'" d="M2.5 6h7" stroke-linecap="round"/>
+                            <path t-else="" d="M6 9.5V3M3 6l3-3 3 3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <t t-esc="stat.delta.label"/>
+                    </span>
+                </span>
+                <span class="lik-dash-kpi-figure">
+                    <span class="lik-dash-kpi-value" t-esc="stat.value"/>
+                    <span t-if="stat.unit" class="lik-dash-kpi-unit" t-esc="stat.unit"/>
+                </span>
+                <span class="lik-dash-kpi-foot">
+                    <span t-if="stat.hint" class="lik-dash-kpi-hint" t-esc="stat.hint"/>
+                    <LikSparkline t-if="stat.series" data="stat.series" tone="stat.tone"/>
+                </span>
+            </button>
+        </section>
+
+        <!-- === Suivi d'une commande ou d'une course ===================== -->
+        <section class="lik-dash-panel lik-dash-panel--full lik-dash-progress" t-if="data.progress">
+            <header class="lik-dash-panel-head">
+                <h2 t-esc="data.progress.title"/>
+                <span class="lik-dash-code" t-esc="data.progress.code"/>
+            </header>
+            <ol class="lik-dash-steps">
+                <li t-foreach="data.progress.steps" t-as="step" t-key="step_index"
+                    t-attf-class="lik-dash-step lik-dash-step--{{ step.status }}">
+                    <span class="lik-dash-step-dot">
+                        <i t-if="step.status === 'done'" class="fa fa-check"/>
+                    </span>
+                    <span class="lik-dash-step-label" t-esc="step.label"/>
+                </li>
+            </ol>
+            <div class="lik-dash-alert" t-if="data.progress.alert">
+                <i class="fa fa-exclamation-triangle"/>
+                <span t-esc="data.progress.alert"/>
+            </div>
+        </section>
+
+        <!-- === Panneaux graphiques ====================================== -->
+        <section class="lik-dash-charts" t-if="data.charts.length">
+            <t t-foreach="data.charts" t-as="chart" t-key="chart.title">
+                <LikAreaChart t-if="chart.kind === 'area'" chart="chart"/>
+                <LikDonut t-if="chart.kind === 'donut'" chart="chart"/>
+                <LikAllocation t-if="chart.kind === 'allocation'" chart="chart"/>
+                <LikPairs t-if="chart.kind === 'pairs'" chart="chart"/>
+            </t>
+        </section>
+
+        <!-- === Fil d'activite et tableaux =============================== -->
+        <section class="lik-dash-lower" t-if="data.activity.length or data.tables.length">
+            <div class="lik-dash-lower-side">
+                <section class="lik-dash-panel lik-dash-panel--full" t-if="data.activity.length">
+                    <header class="lik-dash-panel-head">
+                        <h2>Activité récente</h2>
+                        <p class="lik-dash-panel-sub">Ce qui vient de se passer sur la période.</p>
+                    </header>
+                    <ol class="lik-dash-feed">
+                        <li t-foreach="data.activity" t-as="event" t-key="event_index"
+                            class="lik-dash-feed-item">
+                            <span t-attf-class="lik-dash-feed-dot lik-dash-feed-dot--{{ event.tone }}"/>
+                            <span class="lik-dash-feed-text">
+                                <span class="lik-dash-feed-title" t-esc="event.title"/>
+                                <span t-if="event.detail" class="lik-dash-feed-detail" t-esc="event.detail"/>
+                            </span>
+                            <span class="lik-dash-feed-time" t-esc="event.time"/>
+                        </li>
+                    </ol>
+                </section>
+            </div>
+
+            <div class="lik-dash-lower-main">
+                <div t-foreach="data.tables" t-as="table" t-key="table.title"
+                     class="lik-dash-panel lik-dash-panel--full">
+                    <header class="lik-dash-panel-head">
+                        <div>
+                            <h2 t-esc="table.title"/>
+                        </div>
+                        <button type="button" class="lik-dash-more"
+                                t-on-click="() => this.openList(table.model)">Tout voir</button>
+                    </header>
+                    <div class="lik-dash-scroll">
+                        <table class="lik-dash-table">
+                            <thead>
+                                <tr>
+                                    <th t-foreach="table.columns" t-as="col" t-key="col_index" t-esc="col"/>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-if="!table.rows.length" class="lik-dash-empty">
+                                    <td t-att-colspan="table.columns.length" t-esc="table.empty"/>
+                                </tr>
+                                <tr t-foreach="table.rows" t-as="row" t-key="row.id"
+                                    class="lik-dash-row"
+                                    t-on-click="() => this.openRecord(table.model, row.id)">
+                                    <td t-foreach="row.cells" t-as="cell" t-key="cell_index">
+                                        <span t-if="cell.tone" t-attf-class="lik-dash-badge lik-dash-badge--{{ cell.tone }}"
+                                              t-esc="cell.text"/>
+                                        <span t-else="" t-esc="cell.text"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div t-else="" class="lik-dash-loading">
+        <i class="fa fa-circle-o-notch fa-spin"/>
+    </div>
+</t>
+
+</templates>

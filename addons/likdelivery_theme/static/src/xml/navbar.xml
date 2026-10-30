@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="likdelivery_theme.NavBarBrand" t-inherit="web.NavBar" t-inherit-mode="extension">
+        <xpath expr="//DropdownItem[@t-esc='currentApp.name']" position="before">
+            <a t-if="!this.ui.isSmall and currentApp"
+               class="o_menu_brand_logo d-flex align-items-center"
+               t-att-href="getMenuItemHref(currentApp)">
+                <img class="lik-app-logo" src="/likdelivery_theme/static/img/logo.png" alt="LikDelivery"/>
+            </a>
+        </xpath>
+    </t>
+
+</templates>

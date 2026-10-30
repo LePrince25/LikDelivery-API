@@ -1,0 +1,258 @@
+///
+/// LikDelivery design tokens -> palette du client web Odoo.
+/// Valeurs reprises de LikDelivery-Web/src/app/globals.css, bloc
+/// `:root[data-theme="light"]`.
+/// Ce fichier est ajoute apres ceux de `web` dans web._assets_primary_variables
+/// et n'utilise donc pas `!default` : ses affectations gagnent.
+///
+
+// ---- Jetons LikDelivery ---------------------------------------------
+// Definis ici et non dans chaque feuille : _assets_primary_variables entre
+// dans web.assets_frontend comme dans web.assets_backend, donc auth.scss et
+// backend.scss partagent la meme source de verite.
+$o-lik-bg-0: #f4f7fc; // --pl-bg-0 : canevas
+$o-lik-bg-1: #ffffff; // --pl-bg-1 : carte
+$o-lik-bg-2: #f1f5f9; // --pl-bg-2 : surface subtile
+$o-lik-bg-3: #e2e8f0;
+$o-lik-line: #e2e8f0; // --pl-line
+$o-lik-line-strong: #cbd5e1; // --pl-line-strong
+$o-lik-ink-1: #111827; // --pl-ink-1 : encre
+$o-lik-ink-2: #64748b; // --pl-ink-2 : encre douce
+$o-lik-ink-3: #94a3b8; // --pl-ink-3
+$o-lik-accent: #2563eb; // --pl-cyan
+$o-lik-accent-2: #1d4ed8; // --pl-cyan-2
+$o-lik-accent-3: #1e3a8a; // bleu de contour, reserve a la barre de navigation
+$o-lik-glow: 0 0 18px rgba($o-lik-accent, 0.30); // --pl-cyan-glow
+
+// ---- Rampe grise, orientation claire --------------------------------
+// 100 = surface la plus claire, 900 = encre : le sens natif d'Odoo.
+$o-gray-100: $o-lik-bg-2;
+$o-gray-200: $o-lik-bg-3;
+$o-gray-300: $o-lik-line-strong;
+$o-gray-400: $o-lik-ink-3;
+$o-gray-500: $o-lik-ink-2;
+$o-gray-600: #475569;
+$o-gray-700: #334155;
+$o-gray-800: #1e293b;
+$o-gray-900: $o-lik-ink-1;
+
+// Bootstrap garde sa propre rampe $gray-* et compile des valeurs litterales
+// (#f8f9fa, #dee2e6) dans les regles qu'il genere ; sans cette seconde passe,
+// les surfaces restent aux gris neutres d'origine au lieu du bleu ardoise.
+$gray-100: $o-gray-100;
+$gray-200: $o-gray-200;
+$gray-300: $o-gray-300;
+$gray-400: $o-gray-400;
+$gray-500: $o-gray-500;
+$gray-600: $o-gray-600;
+$gray-700: $o-gray-700;
+$gray-800: $o-gray-800;
+$gray-900: $o-gray-900;
+$grays: (
+    "100": $gray-100, "200": $gray-200, "300": $gray-300, "400": $gray-400,
+    "500": $gray-500, "600": $gray-600, "700": $gray-700, "800": $gray-800,
+    "900": $gray-900,
+);
+$gray-600-dark: $gray-600;
+$gray-700-dark: $gray-700;
+$gray-800-dark: $gray-800;
+$gray-900-dark: $gray-900;
+
+// Ancre : $dark/$light/$gray-dark designent des roles fixes, pas des crans
+// de la rampe ; explicites pour rester justes si la rampe bouge.
+$dark: $o-lik-ink-1;
+$light: $o-lik-bg-2;
+$gray-dark: $o-gray-700;
+
+// ---- Marque ---------------------------------------------------------
+// $o-brand-odoo alimente l'indicateur de chargement et l'en-tete de recherche
+// mobile : une couleur de marque, donc le bleu. Le fond de la barre de
+// navigation se regle plus bas via $o-navbar-background.
+$o-community-color: $o-lik-accent;
+$o-brand-odoo: $o-lik-accent;
+$o-brand-primary: $o-lik-accent;
+$o-brand-secondary: $o-lik-ink-2;
+$o-brand-lightsecondary: $o-lik-bg-2;
+
+$o-action: $o-lik-accent-2;
+$o-success: #16a34a;
+$o-warning: #f59e0b;
+$o-danger: #dc2626;
+$o-info: #0284c7;
+
+// ---- Texte ----------------------------------------------------------
+$o-main-text-color: $o-lik-ink-1;
+$o-main-headings-color: $o-lik-ink-1;
+$o-main-color-muted: $o-lik-ink-2;
+$o-main-link-color: $o-lik-accent-2; // --pl-logo-accent
+$o-main-favorite-color: #f59e0b;
+$o-main-code-color: $o-lik-accent;
+
+// ---- Surfaces -------------------------------------------------------
+$o-webclient-background-color: $o-lik-bg-0;
+$o-view-background-color: $o-lik-bg-1;
+
+// ---- Composants -----------------------------------------------------
+// web calcule $o-component-active-bg a partir de SON $o-action (violet) avant
+// ce fichier : les trois valeurs sont donc rejouees ici.
+$o-component-active-color: $o-lik-accent-2;
+$o-component-active-bg: rgba($o-lik-accent, 0.10);
+$o-component-active-border: $o-lik-accent;
+$o-form-lightsecondary: $o-lik-line;
+$o-input-border-required: $o-lik-accent;
+$o-input-invalid-bg: rgba($o-danger, 0.06);
+
+// ---- Barre de navigation -------------------------------------------
+// navbar.variables.scss est dans _assets_primary_variables, donc avant ce
+// fichier : ses !default sont encore libres. Barre bleue, entrees blanches ;
+// les pastilles translucides des onglets se reglent dans backend.scss.
+$o-navbar-background: $o-lik-accent-2;
+$o-navbar-border-bottom: 1px solid $o-lik-accent-3;
+// Retrait vertical : les entrees deviennent des pastilles de 34px dans une
+// barre de 46px au lieu de la remplir de bout en bout.
+$o-navbar-padding-v: 6px;
+$o-navbar-entry-color: rgba($o-lik-bg-1, 0.86);
+$o-navbar-entry-color--hover: $o-lik-bg-1;
+$o-navbar-entry-bg--hover: rgba($o-lik-bg-1, 0.16);
+$o-navbar-entry-color--active: $o-lik-bg-1;
+$o-navbar-entry-bg--active: rgba($o-lik-bg-1, 0.26);
+$o-navbar-brand-color: $o-lik-bg-1;
+// Pas de $o-navbar-entry-border-radius ici : il n'alimente que le placeholder
+// gele de navbar.variables.scss. Le rayon des pastilles se rejoue en regle
+// dans backend.scss.
+
+// ---- Forme et typo --------------------------------------------------
+$o-border-radius: o-to-rem(8px); // --radius-2
+$o-border-radius-sm: o-to-rem(6px);
+$o-border-radius-lg: o-to-rem(16px); // --radius-4
+// Corps de texte agrandi d'un cran partout dans le backend. Les quatre
+// tailles sont liees (small/smaller sont des declinaisons du corps) : les
+// monter ensemble evite que les labels et les meta ne redeviennent minuscules
+// a cote du reste. $o-label-font-size-factor compte sur le corps, donc 0.87
+// suffit a rendre les labels de formulaire lisibles.
+$o-font-size-base: o-to-rem(15px); // --type-body
+$o-font-size-base-touch: o-to-rem(17px);
+$o-font-size-base-small: o-to-rem(14px);
+$o-font-size-base-smaller: o-to-rem(13px);
+$o-label-font-size-factor: 0.87;
+// navbar.variables.scss a fige $o-navbar-font-size sur l'ancienne taille du
+// corps : rejoue ici pour que les onglets suivent, eux aussi.
+$o-navbar-font-size: $o-font-size-base;
+$o-font-family-sans-serif: o-add-unicode-support-font(("Inter", $o-system-fonts));
+$o-headings-font-family: o-add-unicode-support-font(("Archivo Black", "Inter", $o-system-fonts));
+
+// ---- Cartes figees par web ------------------------------------------
+// web construit $o-grays et $o-btns-bs-override dans SON primary_variables,
+// donc avant ce fichier : ces cartes ont capture le violet et les gris
+// d'origine (#71639e, #dee2e6) meme apres changement de $o-gray-*. Elles
+// doivent etre rejouees ici, en dernier, une fois toutes nos variables posees.
+$o-grays: (
+    100: $o-gray-100,
+    200: $o-gray-200,
+    300: $o-gray-300,
+    400: $o-gray-400,
+    500: $o-gray-500,
+    600: $o-gray-600,
+    700: $o-gray-700,
+    800: $o-gray-800,
+    900: $o-gray-900,
+);
+
+$o-btns-bs-override: (
+    "primary": (
+        background: $o-brand-primary,
+        border: $o-brand-primary,
+        color: $o-white,
+
+        hover-background: $o-action,
+        hover-border: $o-action,
+        hover-color: $o-white,
+
+        active-background: $o-action,
+        active-border: $o-action,
+        active-color: $o-white,
+    ),
+    "secondary": (
+        background: $o-white,
+        border: $o-gray-300,
+        color: $o-gray-800,
+
+        hover-background: $o-gray-100,
+        hover-border: $o-gray-400,
+        hover-color: $o-gray-900,
+
+        active-background: $o-component-active-bg,
+        active-border: $o-component-active-border,
+        active-color: $o-component-active-color,
+    ),
+    "light": (
+        background: $o-gray-100,
+        border: $o-gray-200,
+        color: $o-gray-800,
+
+        hover-background: $o-gray-200,
+        hover-border: $o-gray-300,
+        hover-color: $o-gray-900,
+
+        active-background: $o-gray-200,
+        active-border: $o-gray-400,
+        active-color: $o-gray-900,
+    ),
+);
+
+$o-btns-bs-outline-override: (
+    "primary": (
+        background: transparent,
+        border: $o-brand-primary,
+        color: $o-brand-primary,
+
+        hover-background: $o-brand-primary,
+        hover-border: $o-brand-primary,
+        hover-color: $o-white,
+
+        active-background: $o-component-active-bg,
+        active-border: $o-component-active-border,
+        active-color: $o-component-active-color,
+    ),
+    "secondary": (
+        background: transparent,
+        border: $o-gray-300,
+        color: $o-gray-700,
+
+        hover-background: $o-gray-100,
+        hover-border: $o-gray-400,
+        hover-color: $o-gray-900,
+
+        active-background: $o-component-active-bg,
+        active-border: $o-component-active-border,
+        active-color: $o-component-active-color,
+    ),
+);
+
+// ---- Derives figes des feuilles .variables.scss -----------------------
+// Meme piege que les cartes ci-dessus : chaque composant calcule ses variables
+// dans _assets_primary_variables, donc avant ce fichier, a partir des valeurs
+// par defaut d'Odoo. Sans cette seconde passe, le kanban, le tiroir mobile, le
+// bandeau de controle et les classes .text-action gardent le violet et les
+// gris neutres d'origine.
+$o-kanban-background: $o-gray-100;
+// Le bandeau du tiroir mobile chapeaute la barre de navigation : meme bleu,
+// donc encre blanche (les deux variables sont liees dans burger_menu.scss).
+$o-burger-topbar-bg: $o-lik-accent-2;
+$o-burger-topbar-color: $o-lik-bg-1;
+$o-control-panel-background-color: $o-view-background-color;
+$o-control-panel-border-bottom: 1px solid $o-gray-300;
+$o-we-color-primary: $o-brand-primary;
+
+$o-text-colors-custom: (
+    "action": $o-action,
+    "favourite": $o-main-favorite-color,
+);
+$o-bg-colors-custom: (
+    "action": $o-action,
+    "view": $o-view-background-color,
+    "favourite": $o-main-favorite-color,
+);
+$o-btn-custom: (
+    "favourite": $o-main-favorite-color,
+);

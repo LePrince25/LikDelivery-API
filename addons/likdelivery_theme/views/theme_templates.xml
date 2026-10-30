@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="lik_web_layout" inherit_id="web.layout" priority="90">
+        <xpath expr="//link[@rel='shortcut icon']" position="replace">
+            <link rel="shortcut icon" type="image/png" href="/likdelivery_theme/static/img/logo.png"/>
+            <link rel="icon" type="image/png" sizes="500x500" href="/likdelivery_theme/static/img/logo.png"/>
+        </xpath>
+        <xpath expr="//title" position="attributes">
+            <attribute name="t-esc">title or 'Livraison Express'</attribute>
+        </xpath>
+    </template>
+
+</odoo>

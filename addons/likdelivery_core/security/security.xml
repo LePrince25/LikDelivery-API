@@ -38,8 +38,6 @@
     </record>
 
     <!-- ===== Permissions granulaires ===== -->
-    <delete id="group_lik_perm_dashboard" model="res.groups"/>
-
     <record id="group_lik_perm_orders_view" model="res.groups">
         <field name="name">Consulter les commandes</field>
         <field name="privilege_id" ref="privilege_lik_permissions"/>

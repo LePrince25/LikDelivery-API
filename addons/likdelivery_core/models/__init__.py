@@ -14,3 +14,4 @@ from . import lik_notification
 from . import lik_driver_location
 from . import lik_audit_log
 from . import lik_wallet_withdrawal
+from . import lik_dashboard

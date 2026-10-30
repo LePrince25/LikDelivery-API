@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- No landing screen: the Livraison app opens its first menu with an
-         action (Opérations > Commandes). The deletes drop the records left by
-         the earlier act_url and OWL client-action versions of the dashboard. -->
-    <delete id="menu_lik_dashboard" model="ir.ui.menu"/>
-    <delete id="action_lik_dashboard" model="ir.actions.client"/>
+    <!-- ===== Tableau de bord ===== -->
+    <!-- Premier menu de l'app et action d'atterrissage de l'icone : le contenu
+         est rendu par le composant OWL likdelivery_core/static/src/dashboard,
+         qui demande a likdelivery.dashboard les indicateurs du role connecte. -->
+    <record id="action_lik_dashboard" model="ir.actions.client">
+        <field name="name">Tableau de bord</field>
+        <field name="tag">likdelivery_dashboard</field>
+    </record>
 
-    <!-- Root menu: visible as soon as the user holds at least one permission. -->
+    <!-- Root menu: visible as soon as the user holds at least one permission.
+         La marque affiche « LikDelivery » (mis en capitales par le theme) :
+         c'est le nom du produit, pas celui de la categorie. -->
     <record id="menu_likdelivery_root" model="ir.ui.menu">
-        <field name="name">Livraison</field>
+        <field name="name">LikDelivery</field>
         <field name="sequence">10</field>
         <field name="web_icon">likdelivery_core,static/description/icon.svg</field>
-        <field name="action" eval="False"/>
+        <field name="action" ref="action_lik_dashboard"/>
         <field name="group_ids" eval="[Command.set([
             ref('likdelivery_core.group_lik_perm_orders_view'),
             ref('likdelivery_core.group_lik_perm_catalog_view'),
@@ -25,10 +30,56 @@
         ])]"/>
     </record>
 
+    <!-- Sans groupes : chaque role a son tableau de bord, le perimetre des
+         donnees est deja filtre par les regles d'enregistrement. -->
+    <menuitem id="menu_lik_dashboard"
+              name="Tableau de bord"
+              parent="menu_likdelivery_root"
+              action="action_lik_dashboard"
+              sequence="10"/>
+
+    <!-- ===== Administration ===== -->
+    <!-- Le pilotage des comptes (qui est valide, quelle flotte, quelles
+         plages) est reserve aux profils d'administration ; les roles metier
+         gardent Opérations, Catalogue et Finance. -->
+    <menuitem id="menu_likdelivery_administration"
+              name="Administration"
+              parent="menu_likdelivery_root"
+              sequence="20"
+              groups="likdelivery_core.group_lik_perm_kyc_manage,likdelivery_core.group_lik_perm_network_manage,likdelivery_core.group_lik_perm_admin_manage"/>
+    <menuitem id="menu_lik_users"
+              name="Utilisateurs"
+              action="action_lik_users"
+              parent="menu_likdelivery_administration"
+              sequence="10"
+              groups="likdelivery_core.group_lik_perm_network_view"/>
+    <menuitem id="menu_lik_pending_kyc"
+              name="Demandes KYC"
+              action="action_lik_pending_kyc"
+              parent="menu_likdelivery_administration"
+              sequence="20"
+              groups="likdelivery_core.group_lik_perm_kyc_manage"/>
+    <menuitem id="menu_lik_shop_drivers"
+              action="action_lik_shop_drivers"
+              parent="menu_likdelivery_administration"
+              sequence="30"
+              groups="likdelivery_core.group_lik_perm_network_view"/>
+    <menuitem id="menu_lik_fleet_drivers"
+              action="action_lik_fleet_drivers"
+              parent="menu_likdelivery_administration"
+              sequence="40"
+              groups="likdelivery_core.group_lik_perm_network_view"/>
+    <menuitem id="menu_lik_opening_hours"
+              action="action_lik_opening_hours"
+              parent="menu_likdelivery_administration"
+              sequence="50"
+              groups="likdelivery_core.group_lik_perm_network_view"/>
+
+    <!-- ===== Opérations ===== -->
     <menuitem id="menu_likdelivery_operations"
               name="Opérations"
               parent="menu_likdelivery_root"
-              sequence="10"
+              sequence="30"
               groups="likdelivery_core.group_lik_perm_orders_view"/>
     <menuitem id="menu_lik_orders"
               action="action_lik_orders"
@@ -51,10 +102,11 @@
               sequence="40"
               groups="likdelivery_core.group_lik_perm_orders_view"/>
 
+    <!-- ===== Catalogue ===== -->
     <menuitem id="menu_likdelivery_catalog"
               name="Catalogue"
               parent="menu_likdelivery_root"
-              sequence="20"
+              sequence="40"
               groups="likdelivery_core.group_lik_perm_catalog_view"/>
     <menuitem id="menu_lik_products"
               action="action_lik_products"
@@ -67,36 +119,11 @@
               sequence="20"
               groups="likdelivery_core.group_lik_perm_catalog_view"/>
 
-    <menuitem id="menu_likdelivery_network"
-              name="Réseau"
-              parent="menu_likdelivery_root"
-              sequence="30"
-              groups="likdelivery_core.group_lik_perm_network_view"/>
-    <menuitem id="menu_lik_users"
-              action="action_lik_users"
-              parent="menu_likdelivery_network"
-              sequence="10"
-              groups="likdelivery_core.group_lik_perm_network_view"/>
-    <menuitem id="menu_lik_shop_drivers"
-              action="action_lik_shop_drivers"
-              parent="menu_likdelivery_network"
-              sequence="20"
-              groups="likdelivery_core.group_lik_perm_network_view"/>
-    <menuitem id="menu_lik_fleet_drivers"
-              action="action_lik_fleet_drivers"
-              parent="menu_likdelivery_network"
-              sequence="30"
-              groups="likdelivery_core.group_lik_perm_network_view"/>
-    <menuitem id="menu_lik_opening_hours"
-              action="action_lik_opening_hours"
-              parent="menu_likdelivery_network"
-              sequence="40"
-              groups="likdelivery_core.group_lik_perm_network_view"/>
-
+    <!-- ===== Finance ===== -->
     <menuitem id="menu_likdelivery_finance"
               name="Finance"
               parent="menu_likdelivery_root"
-              sequence="40"
+              sequence="50"
               groups="likdelivery_core.group_lik_perm_finance_view"/>
     <menuitem id="menu_lik_payment_transactions"
               action="action_lik_payment_transactions"
@@ -109,11 +136,12 @@
               sequence="20"
               groups="likdelivery_core.group_lik_perm_finance_view"/>
 
+    <!-- ===== Supervision ===== -->
     <menuitem id="menu_likdelivery_supervision"
               name="Supervision"
               parent="menu_likdelivery_root"
-              sequence="50"
-              groups="likdelivery_core.group_lik_perm_supervision_view,likdelivery_core.group_lik_perm_kyc_manage,likdelivery_core.group_lik_perm_notifications_manage,likdelivery_core.group_lik_perm_admin_manage"/>
+              sequence="60"
+              groups="likdelivery_core.group_lik_perm_supervision_view,likdelivery_core.group_lik_perm_notifications_manage,likdelivery_core.group_lik_perm_admin_manage"/>
     <menuitem id="menu_lik_notifications"
               action="action_lik_notifications"
               parent="menu_likdelivery_supervision"
@@ -124,20 +152,15 @@
               parent="menu_likdelivery_supervision"
               sequence="20"
               groups="likdelivery_core.group_lik_perm_supervision_view"/>
-    <menuitem id="menu_lik_pending_kyc"
-              action="action_lik_pending_kyc"
-              parent="menu_likdelivery_supervision"
-              sequence="15"
-              groups="likdelivery_core.group_lik_perm_kyc_manage"/>
     <menuitem id="menu_lik_notification_test"
               action="action_notification_test"
               parent="menu_likdelivery_supervision"
-              sequence="25"
+              sequence="30"
               groups="likdelivery_core.group_lik_perm_notifications_manage"/>
     <menuitem id="menu_lik_cancellation_rules"
               action="action_lik_cancellation_rules"
               parent="menu_likdelivery_supervision"
-              sequence="30"
+              sequence="40"
               groups="likdelivery_core.group_lik_perm_admin_manage"/>
 
 </odoo>

@@ -1,0 +1,989 @@
+///
+/// Tableau de bord Livraison : indicateurs à tendance, panneaux graphiques,
+/// fil d'activité et tableaux. Palette et rythme repris du thème clair de
+/// LikDelivery-Web (tokens `--pl-*`), socle visuel du back-office.
+/// Les valeurs `!default` gardent le rendu lisible sans likdelivery_theme.
+///
+
+$o-lik-bg-0: #f4f7fc !default;
+$o-lik-bg-1: #ffffff !default;
+$o-lik-bg-2: #f1f5f9 !default;
+$o-lik-bg-3: #e2e8f0 !default;
+$o-lik-line: #e2e8f0 !default;
+$o-lik-line-strong: #cbd5e1 !default;
+$o-lik-ink-1: #111827 !default;
+$o-lik-ink-2: #64748b !default;
+$o-lik-ink-3: #94a3b8 !default;
+$o-lik-accent: #2563eb !default;
+$o-lik-accent-2: #1d4ed8 !default;
+
+$lik-tones: (
+    "accent": $o-lik-accent,
+    "accent2": $o-lik-accent-2,
+    "success": #16a34a,
+    "warning": #f59e0b,
+    "danger": #dc2626,
+    "purple": #7c3aed,
+    "orange": #ea580c,
+    "ink": #334155,
+    "muted": $o-lik-ink-3,
+);
+
+$lik-display: "Archivo Black", "Inter", system-ui, sans-serif;
+
+// Grille de six colonnes : les panneaux se partagent la ligne selon leur
+// nature, un graphique large jamais plus de deux tiers de la place.
+$lik-cols: 6;
+
+// Pas de largeur maximale : le tableau de bord occupe tout le content-area,
+// seule la respiration latérale croît avec l'écran.
+.lik-dash {
+    padding: 1.5rem 1.25rem 3rem;
+    color: $o-lik-ink-1;
+
+    @media (min-width: 1536px) {
+        padding: 1.75rem 2.5rem 3rem;
+    }
+}
+
+// Une période se recharge sans vider l'écran : on voile, on ne clignote pas.
+.lik-dash--busy {
+    opacity: 0.65;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.lik-dash-loading {
+    display: flex;
+    justify-content: center;
+    padding: 5rem 0;
+    font-size: 1.65rem;
+    color: $o-lik-ink-2;
+}
+
+// ---- En-tête ---------------------------------------------------------
+.lik-dash-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.lik-dash-role {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background-color: rgba($o-lik-accent, 0.1);
+    color: $o-lik-accent-2;
+    font-size: 0.83rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.lik-dash-title {
+    margin: 0.5rem 0 0;
+    font-family: $lik-display;
+    font-size: 1.76rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.lik-dash-subtitle {
+    margin: 0.25rem 0 0;
+    color: $o-lik-ink-2;
+    font-size: 0.96rem;
+}
+
+.lik-dash-periods {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.2rem;
+    border: 1px solid $o-lik-line;
+    border-radius: 999px;
+    background-color: $o-lik-bg-1;
+}
+
+.lik-dash-period {
+    padding: 0.3rem 0.85rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: $o-lik-ink-2;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        color: $o-lik-accent-2;
+    }
+
+    &--active {
+        background-color: $o-lik-accent;
+        color: $o-lik-bg-1;
+
+        &:hover {
+            color: $o-lik-bg-1;
+        }
+    }
+}
+
+.lik-dash-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(#f59e0b, 0.4);
+    border-radius: 12px;
+    background-color: rgba(#f59e0b, 0.08);
+    color: #92400e;
+    font-size: 0.96rem;
+}
+
+// ---- Indicateurs -----------------------------------------------------
+.lik-dash-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+// Chaque carte est le bouton d'entrée de la page qui détaille l'indicateur.
+.lik-dash-kpi {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1.05rem 1.15rem 1.15rem;
+    // Reprise d'un <button> : typographie du texte voisin, pas le relief ni le
+    // centrage par défaut du navigateur.
+    appearance: none;
+    background-color: $o-lik-bg-1;
+    border: 1px solid $o-lik-line;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba($o-lik-ink-1, 0.05);
+    color: $o-lik-ink-1;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+    &:hover:not(.lik-dash-kpi--static),
+    &:focus-visible:not(.lik-dash-kpi--static) {
+        box-shadow: 0 6px 18px rgba($o-lik-ink-1, 0.1);
+        transform: translateY(-1px);
+    }
+
+    &--static {
+        cursor: default;
+    }
+}
+
+.lik-dash-kpi-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.lik-dash-kpi-label {
+    color: $o-lik-ink-2;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.lik-dash-kpi-figure {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.lik-dash-kpi-value {
+    font-family: $lik-display;
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    word-break: break-word;
+}
+
+.lik-dash-kpi-unit {
+    color: $o-lik-ink-2;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.lik-dash-kpi-foot {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
+.lik-dash-kpi-hint {
+    min-width: 0;
+    color: $o-lik-ink-3;
+    font-size: 0.78rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lik-dash-spark {
+    flex: 0 0 auto;
+    overflow: visible;
+}
+
+// Pastille de variation : demi-fenêtre contre demi-fenêtre, jamais une
+// valeur simulée.
+.lik-dash-pill {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+
+    &--up {
+        background-color: rgba(map-get($lik-tones, "success"), 0.12);
+        color: darken(map-get($lik-tones, "success"), 6%);
+    }
+
+    &--down {
+        background-color: rgba(map-get($lik-tones, "danger"), 0.12);
+        color: darken(map-get($lik-tones, "danger"), 6%);
+    }
+
+    &--flat {
+        background-color: rgba($o-lik-ink-3, 0.16);
+        color: $o-lik-ink-2;
+    }
+}
+
+.lik-dash-pill-arrow {
+    width: 0.62rem;
+    height: 0.62rem;
+
+    .lik-dash-pill--down & {
+        transform: rotate(180deg);
+    }
+}
+
+// ---- Panneaux --------------------------------------------------------
+.lik-dash-charts {
+    display: grid;
+    grid-template-columns: repeat($lik-cols, minmax(0, 1fr));
+    gap: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.lik-dash-lower {
+    display: grid;
+    grid-template-columns: minmax(300px, 1fr) 2fr;
+    gap: 1.1rem;
+    align-items: start;
+}
+
+.lik-dash-lower-side,
+.lik-dash-lower-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    // Un panneau trop large doit faire défiler son contenu, pas la page.
+    min-width: 0;
+}
+
+.lik-dash-panel {
+    display: flex;
+    flex-direction: column;
+    // min-width: 0 : sans ça, un tableau large élargit la colonne de grille au
+    // lieu de faire défiler son propre conteneur.
+    min-width: 0;
+    background-color: $o-lik-bg-1;
+    border: 1px solid $o-lik-line;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba($o-lik-ink-1, 0.05);
+    overflow: hidden;
+
+    &--full {
+        grid-column: span $lik-cols;
+    }
+
+    &--wide {
+        grid-column: span 4;
+    }
+
+    &--slim {
+        grid-column: span 2;
+    }
+
+    &--half {
+        grid-column: span 3;
+    }
+}
+
+@media (max-width: 1399px) {
+    .lik-dash-panel--wide,
+    .lik-dash-panel--half {
+        grid-column: span 6;
+    }
+
+    .lik-dash-panel--slim {
+        grid-column: span 3;
+    }
+
+    .lik-dash-lower {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1099px) {
+    .lik-dash-panel--slim {
+        grid-column: span 6;
+    }
+}
+
+.lik-dash-progress {
+    margin-bottom: 1.5rem;
+}
+
+.lik-dash-panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1.15rem;
+    border-bottom: 1px solid $o-lik-line;
+    background-color: $o-lik-bg-2;
+
+    h2 {
+        margin: 0;
+        font-size: 1.02rem;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+}
+
+.lik-dash-panel-sub {
+    // Le sous-titre occupe sa propre ligne : la maquette met le titre en
+    // premier, la précision en dessous, jamais en vis-a-vis.
+    flex: 0 0 100%;
+    order: 2;
+    margin: 0;
+    color: $o-lik-ink-2;
+    font-size: 0.8rem;
+}
+
+.lik-dash-panel-body {
+    padding: 1.1rem 1.15rem 1.25rem;
+}
+
+.lik-dash-panel-empty {
+    margin: 0;
+    color: $o-lik-ink-3;
+    font-size: 0.88rem;
+    font-style: italic;
+    text-align: center;
+}
+
+.lik-dash-more {
+    flex: 0 0 auto;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid $o-lik-line-strong;
+    border-radius: 999px;
+    background-color: $o-lik-bg-1;
+    color: $o-lik-ink-2;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+        border-color: $o-lik-accent;
+        color: $o-lik-accent-2;
+    }
+}
+
+.lik-dash-code {
+    flex: 0 0 auto;
+    padding: 0.1rem 0.5rem;
+    border: 1px solid rgba($o-lik-accent, 0.3);
+    border-radius: 999px;
+    color: $o-lik-accent-2;
+    font-size: 0.83rem;
+    font-weight: 600;
+}
+
+// ---- Aire (flux de trésorerie) ---------------------------------------
+.lik-dash-area {
+    position: relative;
+    height: 240px;
+}
+
+.lik-dash-area-svg {
+    display: block;
+}
+
+.lik-dash-area-axis,
+.lik-dash-area-tick {
+    position: absolute;
+    color: $o-lik-ink-3;
+    font-size: 0.68rem;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.lik-dash-area-axis {
+    left: 0;
+    transform: translateY(-50%);
+}
+
+.lik-dash-area-tick {
+    bottom: 2px;
+    transform: translateX(-50%);
+}
+
+.lik-dash-area-mark {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 2px solid $o-lik-bg-1;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+// Colonnes de survol : une zone HTML par jour, insensible à l'étirement du
+// viewBox.
+.lik-dash-area-cols {
+    position: absolute;
+    inset: 0;
+    display: flex;
+}
+
+.lik-dash-area-col {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: default;
+    appearance: none;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.lik-dash-tooltip {
+    position: absolute;
+    top: 0.5rem;
+    z-index: 10;
+    min-width: 140px;
+    transform: translateX(-50%);
+    padding: 0.5rem 0.65rem;
+    border: 1px solid $o-lik-line;
+    border-radius: 10px;
+    background-color: $o-lik-bg-1;
+    box-shadow: 0 8px 24px rgba($o-lik-ink-1, 0.14);
+    font-size: 0.74rem;
+    pointer-events: none;
+}
+
+.lik-dash-tooltip-head {
+    margin-bottom: 0.3rem;
+    color: $o-lik-ink-1;
+    font-weight: 700;
+}
+
+.lik-dash-tooltip-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    color: $o-lik-ink-2;
+
+    & + & {
+        margin-top: 0.15rem;
+    }
+}
+
+.lik-dash-tooltip-name {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lik-dash-tooltip-value {
+    flex: 0 0 auto;
+    color: $o-lik-ink-1;
+    font-variant-numeric: tabular-nums;
+}
+
+.lik-dash-dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.lik-dash-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.1rem;
+    margin-top: 0.85rem;
+    color: $o-lik-ink-2;
+    font-size: 0.76rem;
+}
+
+.lik-dash-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.lik-dash-legend-total {
+    color: $o-lik-ink-1;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+// ---- Anneau ----------------------------------------------------------
+.lik-dash-donut-body {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.lik-dash-donut-ring {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+// L'anneau part de 12 h comme sur la maquette : le premier segment est en haut.
+.lik-dash-donut {
+    display: block;
+    transform: rotate(-90deg);
+}
+
+.lik-dash-donut-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    text-align: center;
+}
+
+.lik-dash-donut-value {
+    font-family: $lik-display;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.lik-dash-donut-label {
+    color: $o-lik-ink-3;
+    font-size: 0.63rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.lik-dash-donut-legend {
+    flex: 1 1 150px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.78rem;
+
+        & + li {
+            margin-top: 0.45rem;
+        }
+    }
+}
+
+.lik-dash-legend-name {
+    min-width: 0;
+    flex: 1 1 auto;
+    color: $o-lik-ink-2;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lik-dash-legend-figure {
+    flex: 0 0 auto;
+    color: $o-lik-ink-1;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.lik-dash-legend-text {
+    margin-right: 0.35rem;
+}
+
+.lik-dash-legend-pct {
+    color: $o-lik-ink-3;
+    font-weight: 500;
+}
+
+// ---- Allocation ------------------------------------------------------
+.lik-dash-alloc {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lik-dash-alloc-item + .lik-dash-alloc-item {
+    margin-top: 0.9rem;
+}
+
+.lik-dash-alloc-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+}
+
+.lik-dash-alloc-label {
+    min-width: 0;
+    color: $o-lik-ink-2;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lik-dash-alloc-value {
+    flex: 0 0 auto;
+    color: $o-lik-ink-1;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.lik-dash-alloc-pct {
+    margin-left: 0.4rem;
+    color: $o-lik-ink-3;
+    font-weight: 500;
+}
+
+.lik-dash-alloc-track {
+    height: 6px;
+    margin-top: 0.4rem;
+    border-radius: 999px;
+    background-color: $o-lik-bg-3;
+    overflow: hidden;
+}
+
+.lik-dash-alloc-bar {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.25s ease;
+}
+
+// ---- Barres appariées ------------------------------------------------
+.lik-dash-pairs {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.4rem;
+    height: 190px;
+    margin-top: 0.9rem;
+}
+
+.lik-dash-pair {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.lik-dash-pair-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    height: 160px;
+}
+
+.lik-dash-bar {
+    width: 100%;
+    max-width: 16px;
+    border-radius: 3px 3px 0 0;
+    opacity: 0.92;
+    transition: height 0.25s ease;
+
+    &--a {
+        background-color: map-get($lik-tones, "accent");
+    }
+
+    &--b {
+        background-color: map-get($lik-tones, "warning");
+    }
+}
+
+.lik-dash-pair-label {
+    color: $o-lik-ink-3;
+    font-size: 0.66rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+    text-overflow: ellipsis;
+}
+
+// ---- Fil d'activité --------------------------------------------------
+.lik-dash-feed {
+    position: relative;
+    margin: 0;
+    padding: 1.1rem 1.15rem 1.25rem 1.6rem;
+    list-style: none;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 1.4rem;
+        bottom: 1.4rem;
+        left: 1.2rem;
+        width: 1px;
+        background-color: $o-lik-line;
+    }
+}
+
+.lik-dash-feed-item {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+
+    & + & {
+        margin-top: 0.85rem;
+    }
+}
+
+.lik-dash-feed-dot {
+    position: absolute;
+    top: 0.35rem;
+    left: -1rem;
+    width: 9px;
+    height: 9px;
+    border: 2px solid $o-lik-bg-1;
+    border-radius: 50%;
+
+    @each $tone, $color in $lik-tones {
+        &--#{$tone} {
+            background-color: $color;
+        }
+    }
+
+}
+
+.lik-dash-feed-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.lik-dash-feed-title {
+    color: $o-lik-ink-1;
+    font-size: 0.82rem;
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lik-dash-feed-detail {
+    color: $o-lik-ink-2;
+    font-size: 0.75rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lik-dash-feed-time {
+    flex: 0 0 auto;
+    color: $o-lik-ink-3;
+    font-size: 0.7rem;
+}
+
+// ---- Suivi -----------------------------------------------------------
+.lik-dash-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0;
+    margin: 0;
+    padding: 1.1rem;
+    list-style: none;
+}
+
+.lik-dash-step {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 130px;
+    color: $o-lik-ink-2;
+    font-size: 0.88rem;
+
+    &::after {
+        content: "";
+        flex: 1 1 auto;
+        height: 2px;
+        margin: 0 0.5rem;
+        background-color: $o-lik-line;
+    }
+
+    &:last-child::after {
+        display: none;
+    }
+}
+
+.lik-dash-step-dot {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-right: 0.45rem;
+    border: 2px solid $o-lik-line;
+    border-radius: 50%;
+    background-color: $o-lik-bg-1;
+    font-size: 0.66rem;
+}
+
+.lik-dash-step--done {
+    color: $o-lik-ink-1;
+
+    .lik-dash-step-dot {
+        border-color: $o-lik-accent;
+        background-color: $o-lik-accent;
+        color: $o-white;
+    }
+
+    &::after {
+        background-color: $o-lik-accent;
+    }
+}
+
+.lik-dash-step--current {
+    font-weight: 700;
+    color: $o-lik-accent-2;
+
+    .lik-dash-step-dot {
+        border-color: $o-lik-accent;
+        box-shadow: 0 0 0 4px rgba($o-lik-accent, 0.15);
+        color: $o-lik-accent;
+    }
+}
+
+.lik-dash-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1.1rem 1rem;
+    color: #b91c1c;
+    font-size: 0.94rem;
+}
+
+// ---- Tableaux --------------------------------------------------------
+.lik-dash-scroll {
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.lik-dash-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+    th {
+        padding: 0.6rem 1.1rem;
+        color: $o-lik-ink-3;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 0.62rem 1.1rem;
+        border-top: 1px solid $o-lik-line;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    thead th {
+        padding: 0.9rem 1.1rem 0.35rem;
+    }
+}
+
+.lik-dash-row {
+    cursor: pointer;
+
+    &:hover td {
+        background-color: rgba($o-lik-accent, 0.05);
+    }
+}
+
+.lik-dash-empty td {
+    color: $o-lik-ink-2;
+    font-style: italic;
+    text-align: center;
+    white-space: normal;
+}
+
+.lik-dash-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+
+    @each $tone, $color in $lik-tones {
+        &--#{$tone} {
+            background-color: rgba($color, 0.12);
+            color: darken($color, 6%);
+        }
+    }
+
+    &--muted {
+        background-color: $o-lik-bg-2;
+        color: $o-lik-ink-2;
+    }
+}

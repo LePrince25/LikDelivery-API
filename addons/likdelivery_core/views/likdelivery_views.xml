@@ -9,29 +9,42 @@
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page string="Livraison" name="likdelivery">
+                    <!-- Les champs suivent le role choisi : une fiche ne propose
+                         que ce que ce profil doit renseigner. MEME MATRICE que
+                         le formulaire likdelivery.user plus bas ; les deux vues
+                         se lisent chacune dans leur entree de menu, elles doivent
+                         rester d'accord.
+                         Confort de saisie seulement : invisible= ne restreint pas
+                         l'ORM, un champ masque reste lisible en web_read. -->
                     <group>
                         <group string="Compte">
                             <field name="lik_role"/>
                             <field name="lik_first_name"/>
                             <field name="lik_last_name"/>
-                            <field name="lik_company_name"/>
-                            <field name="lik_validated_by_admin"/>
-                            <field name="lik_preferred_societe_id"/>
-                            <field name="lik_employer_societe_id"/>
+                            <field name="lik_company_name"
+                                   invisible="lik_role not in ('fournisseur', 'societe')"/>
+                            <field name="lik_validated_by_admin"
+                                   invisible="lik_role not in ('fournisseur', 'societe')"/>
+                            <field name="lik_preferred_societe_id" invisible="lik_role != 'client'"/>
+                            <field name="lik_employer_societe_id" invisible="lik_role != 'livreur'"/>
                         </group>
-                        <group string="Livreur">
+                        <group string="Livreur" invisible="lik_role != 'livreur'">
                             <field name="lik_vehicle_type"/>
                             <field name="lik_license_plate"/>
                             <field name="lik_average_rating"/>
                             <field name="lik_total_deliveries"/>
                         </group>
-                        <group string="KYC" groups="likdelivery_core.group_lik_perm_kyc_manage">
-                            <field name="lik_id_document" filename="lik_id_document_filename"/>
+                        <group string="KYC"
+                               groups="likdelivery_core.group_lik_perm_kyc_manage"
+                               invisible="lik_role not in ('fournisseur', 'livreur', 'societe')">
+                            <field name="lik_id_document" filename="lik_id_document_filename"
+                                   invisible="lik_role not in ('fournisseur', 'livreur', 'societe')"/>
                             <field name="lik_id_document_filename" invisible="1"/>
-                            <field name="lik_cfe_document" filename="lik_cfe_document_filename"/>
+                            <field name="lik_cfe_document" filename="lik_cfe_document_filename"
+                                   invisible="lik_role not in ('fournisseur', 'societe')"/>
                             <field name="lik_cfe_document_filename" invisible="1"/>
                         </group>
-                        <group string="Portefeuille">
+                        <group string="Portefeuille" invisible="lik_role not in ('fournisseur', 'livreur')">
                             <field name="lik_wallet_earned"/>
                             <field name="lik_wallet_withdrawn"/>
                             <field name="lik_wallet_available"/>
@@ -322,25 +335,30 @@
                     <div class="oe_title">
                         <h1><field name="name"/></h1>
                     </div>
+                    <!-- MEME MATRICE de roles que l'onglet « Livraison » du
+                         partenaire plus haut : les deux vues se consultent depuis
+                         des entrees differentes et doivent rester d'accord. -->
                     <group>
                         <group string="Compte">
                             <field name="phone"/>
                             <field name="lik_role"/>
                             <field name="lik_first_name"/>
                             <field name="lik_last_name"/>
-                            <field name="lik_company_name"/>
-                            <field name="lik_validated_by_admin"/>
+                            <field name="lik_company_name"
+                                   invisible="lik_role not in ('fournisseur', 'societe')"/>
+                            <field name="lik_validated_by_admin"
+                                   invisible="lik_role not in ('fournisseur', 'societe')"/>
+                            <field name="lik_preferred_societe_id" invisible="lik_role != 'client'"/>
+                            <field name="lik_employer_societe_id" invisible="lik_role != 'livreur'"/>
                             <field name="lik_res_user_id" groups="base.group_user"/>
                         </group>
-                        <group string="Livreur / liens">
+                        <group string="Livreur" invisible="lik_role != 'livreur'">
                             <field name="lik_vehicle_type"/>
                             <field name="lik_license_plate"/>
                             <field name="lik_average_rating"/>
                             <field name="lik_total_deliveries"/>
-                            <field name="lik_preferred_societe_id"/>
-                            <field name="lik_employer_societe_id"/>
                         </group>
-                        <group string="Portefeuille">
+                        <group string="Portefeuille" invisible="lik_role not in ('fournisseur', 'livreur')">
                             <field name="lik_wallet_earned"/>
                             <field name="lik_wallet_withdrawn"/>
                             <field name="lik_wallet_available"/>

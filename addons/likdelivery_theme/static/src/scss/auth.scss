@@ -1,0 +1,149 @@
+///
+/// Page d'authentification : fond clair maille de bleu discret, carte blanche
+/// et accents #2563EB, comme le theme `data-theme="light"` du web Next.js.
+/// Classes posees par views/login_templates.xml.
+/// Les jetons $o-lik-* viennent de primary_variables.scss.
+///
+
+body.lik-login-body {
+    min-height: 100vh;
+    background-color: $o-lik-bg-0;
+    background-image:
+        radial-gradient(at 15% 8%, rgba($o-lik-accent, 0.10) 0%, transparent 50%),
+        radial-gradient(at 85% 25%, rgba($o-lik-accent-2, 0.08) 0%, transparent 55%),
+        radial-gradient(at 50% 95%, rgba(#7c3aed, 0.06) 0%, transparent 55%);
+    color: $o-lik-ink-1;
+}
+
+.lik-login-shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2.5rem 1rem;
+}
+
+.lik-login-card {
+    width: 100%;
+    max-width: 420px;
+    background-color: $o-lik-bg-1;
+    border: 1px solid $o-lik-line;
+    border-radius: 16px;
+    box-shadow:
+        0 12px 32px rgba($o-lik-ink-1, 0.08),
+        0 0 0 1px rgba($o-lik-accent, 0.06);
+    color: $o-lik-ink-1;
+
+    .lik-login-card-body {
+        padding: 2rem;
+    }
+}
+
+.lik-login-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+
+    img {
+        height: 44px;
+        width: auto;
+    }
+
+    strong {
+        font-family: "Archivo Black", "Inter", system-ui, sans-serif;
+        font-size: 1.125rem;
+        letter-spacing: 0.01em;
+        color: $o-lik-ink-1;
+    }
+}
+
+.lik-login-heading {
+    margin-bottom: 1.5rem;
+
+    h2 {
+        font-family: "Archivo Black", "Inter", system-ui, sans-serif;
+        font-size: 1.5rem;
+        font-weight: 800;
+        line-height: 1.15;
+        color: $o-lik-ink-1;
+    }
+
+    p {
+        margin: 0.25rem 0 0;
+        color: $o-lik-ink-2;
+        font-size: 0.875rem;
+    }
+}
+
+.lik-login-card {
+    label {
+        color: $o-lik-ink-2;
+        font-size: 0.8125rem;
+    }
+
+    .form-control,
+    .input-group-text {
+        background-color: $o-lik-bg-1;
+        border: 1px solid $o-lik-line-strong;
+        border-radius: 8px;
+        color: $o-lik-ink-1;
+
+        &::placeholder {
+            color: $o-lik-ink-3;
+        }
+
+        &:focus {
+            background-color: $o-lik-bg-1;
+            border-color: $o-lik-accent;
+            color: $o-lik-ink-1;
+            box-shadow: 0 0 0 3px rgba($o-lik-accent, 0.18);
+        }
+    }
+
+    .input-group-text {
+        background-color: $o-lik-bg-2;
+        color: $o-lik-ink-2;
+    }
+
+    .btn-primary {
+        width: 100%;
+        background: linear-gradient(135deg, $o-lik-accent 0%, $o-lik-accent-2 100%);
+        border: 0;
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        box-shadow: $o-lik-glow;
+    }
+
+    // Le bouton passkey et les liens de secours arrivent en .btn-light.
+    .btn-light {
+        background-color: $o-lik-bg-1;
+        border: 1px solid $o-lik-line-strong;
+        color: $o-lik-ink-1;
+
+        &:hover {
+            background-color: $o-lik-bg-2;
+            border-color: rgba($o-lik-accent, 0.7);
+            color: $o-lik-accent-2;
+        }
+    }
+
+    a {
+        color: $o-lik-accent-2;
+
+        &:hover {
+            color: darken($o-lik-accent-2, 8%);
+        }
+    }
+}
+
+.lik-login-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid $o-lik-line;
+    font-size: 0.75rem;
+    color: $o-lik-ink-2;
+}

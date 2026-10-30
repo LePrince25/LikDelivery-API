@@ -18,7 +18,10 @@
         complet. L'API /api/v1/* tourne en sudo() : elle n'est pas impactee.
 
         Les domaines portent sur des Many2one "res.partner" et utilisent donc
-        user.partner_id.id.
+        user.partner_id.id. Une societe est tiers transporteur : les commandes
+        qu'elle livre ne lui appartiennent pas (client_id/supplier_id), d'ou la
+        clause run_ids.livreur_id.lik_employer_societe_id qui aligne l'acces a
+        la commande sur celui deja accorde a sa course.
     -->
 
     <!-- ===== Commandes ===== -->
@@ -26,11 +29,12 @@
         <field name="name">Mes commandes</field>
         <field name="model_id" ref="model_likdelivery_order"/>
         <field name="domain_force">[
-            '|', '|', '|',
+            '|', '|', '|', '|',
             ('client_id', '=', user.partner_id.id),
             ('supplier_id', '=', user.partner_id.id),
             ('run_ids.livreur_id', '=', user.partner_id.id),
             ('preferred_societe_id', '=', user.partner_id.id),
+            ('run_ids.livreur_id.lik_employer_societe_id', '=', user.partner_id.id),
         ]</field>
         <field name="groups" eval="[
             Command.link(ref('likdelivery_core.group_lik_client')),
@@ -52,11 +56,12 @@
         <field name="name">Mes lignes de commande</field>
         <field name="model_id" ref="model_likdelivery_order_line"/>
         <field name="domain_force">[
-            '|', '|', '|',
+            '|', '|', '|', '|',
             ('order_id.client_id', '=', user.partner_id.id),
             ('order_id.supplier_id', '=', user.partner_id.id),
             ('order_id.run_ids.livreur_id', '=', user.partner_id.id),
             ('order_id.preferred_societe_id', '=', user.partner_id.id),
+            ('order_id.run_ids.livreur_id.lik_employer_societe_id', '=', user.partner_id.id),
         ]</field>
         <field name="groups" eval="[
             Command.link(ref('likdelivery_core.group_lik_client')),
